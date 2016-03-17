@@ -11,8 +11,6 @@ require_once __DIR__ . '/bootstrap.php';
 
 use Dakujem\Time,
 	Dakujem\TimeFactory,
-	Oliva\Test\DataWrapper,
-	Oliva\Utils\Tree\Node\Node,
 	Tester,
 	Tester\Assert;
 
@@ -46,7 +44,7 @@ class TimeTest extends Tester\TestCase
 
 	public function testGetters()
 	{
-		$timeZero = new Time(0);
+		$timeZero = Time::fromSeconds(0);
 		Assert::same(0, $timeZero->getSeconds());
 		Assert::same(0, $timeZero->getMinutes());
 		Assert::same(0, $timeZero->getHours());
@@ -59,7 +57,7 @@ class TimeTest extends Tester\TestCase
 
 		$seconds = 6873 * 3600 + 54 * 60 + 18; // 6873 hours 54 minutes 18 seconds
 
-		$time = new Time($seconds);
+		$time = Time::fromSeconds($seconds);
 		Assert::same(18, $time->getSeconds());
 		Assert::same(54, $time->getMinutes());
 		Assert::same(6873, $time->getHours());
@@ -70,7 +68,7 @@ class TimeTest extends Tester\TestCase
 		Assert::same($seconds / 60 / 60, $time->toHours());
 
 
-		$timeNegative = new Time(-1 * $seconds);
+		$timeNegative = Time::fromSeconds(-1 * $seconds);
 		Assert::same(18, $timeNegative->getSeconds());
 		Assert::same(54, $timeNegative->getMinutes());
 		Assert::same(6873, $timeNegative->getHours());
@@ -84,10 +82,96 @@ class TimeTest extends Tester\TestCase
 
 	public function testTimeFunctions()
 	{
-		Assert::same(TRUE, (new Time(0))->isValidDayTime());
-		Assert::same(FALSE, (new Time(-1))->isValidDayTime());
-		Assert::same(TRUE, (new Time(-1))->clipToDayTime()->isValidDayTime());
-		Assert::same(Time::DAY - 1, (new Time(-1))->clipToDayTime()->toSeconds());
+		// is valid day time
+		Assert::same(TRUE, Time::fromSeconds(0)->isValidDayTime());
+		Assert::same(TRUE, Time::fromSeconds(1)->isValidDayTime());
+		Assert::same(FALSE, Time::fromSeconds(Time::DAY)->isValidDayTime());
+		Assert::same(TRUE, Time::fromSeconds(Time::DAY - 1)->isValidDayTime());
+		Assert::same(FALSE, Time::fromSeconds(-1)->isValidDayTime());
+
+		// clip to day time
+		Assert::same(TRUE, Time::fromSeconds(-1)->clipToDayTime()->isValidDayTime());
+		Assert::same(TRUE, Time::fromSeconds(Time::DAY)->clipToDayTime()->isValidDayTime());
+		Assert::same(Time::DAY - 1, Time::fromSeconds(-1)->clipToDayTime()->toSeconds());
+		Assert::same(0, Time::fromSeconds(Time::DAY)->clipToDayTime()->toSeconds());
+	}
+
+
+	public function testArithmeticFunctions()
+	{
+		$t = Time::fromSeconds(6);
+		// add
+		Assert::same(12, $t->add($t)->toSeconds()); // 6+6
+		// sub
+		Assert::same(10, $t->sub(Time::fromSeconds(2))->toSeconds()); // 12-2
+		Assert::same(-10, $t->sub(Time::fromSeconds(20))->toSeconds()); // 10-20
+		// mult
+		Assert::same(-20, $t->mult(2)->toSeconds()); // -10 * 2
+		// div
+		Assert::same(-10, $t->div(2)->toSeconds()); // -20 / 2
+		// mod
+		Assert::same(0, $t->mod(2)->toSeconds()); // -10 % 2
+		$t->add(Time::fromSeconds(6)); // 0+6
+		Assert::same(2, $t->mod(4)->toSeconds()); // 6 % 4
+		Assert::same(-1 % 4, Time::fromSeconds(-1)->mod(4)->toSeconds());
+	}
+
+
+	public function testComparisonFunctions()
+	{
+		$t1 = Time::fromSeconds(-1);
+		$t2 = Time::fromSeconds(0);
+		$t3 = Time::fromSeconds(1);
+
+		// equal
+		Assert::same(TRUE, $t1->eq($t1));
+		Assert::same(FALSE, $t1->eq($t2));
+		Assert::same(FALSE, $t1->eq($t3));
+
+		// not equal
+		Assert::same(FALSE, $t1->neq($t1));
+		Assert::same(TRUE, $t1->neq($t2));
+		Assert::same(TRUE, $t1->neq($t3));
+
+		// less than
+		Assert::same(FALSE, $t1->lt($t1));
+		Assert::same(TRUE, $t1->lt($t2));
+		Assert::same(TRUE, $t1->lt($t3));
+		Assert::same(FALSE, $t2->lt($t1));
+		Assert::same(FALSE, $t2->lt($t2));
+		Assert::same(TRUE, $t2->lt($t3));
+
+		// greater than
+		Assert::same(FALSE, $t1->gt($t1));
+		Assert::same(FALSE, $t1->gt($t2));
+		Assert::same(FALSE, $t1->gt($t3));
+		Assert::same(TRUE, $t2->gt($t1));
+		Assert::same(FALSE, $t2->gt($t2));
+		Assert::same(FALSE, $t2->gt($t3));
+
+		// less than or equal
+		Assert::same(TRUE, $t1->lte($t1));
+		Assert::same(TRUE, $t1->lte($t2));
+		Assert::same(TRUE, $t1->lte($t3));
+		Assert::same(FALSE, $t2->lte($t1));
+		Assert::same(TRUE, $t2->lte($t2));
+		Assert::same(TRUE, $t2->lte($t3));
+
+		// greater than or equal
+		Assert::same(TRUE, $t1->gte($t1));
+		Assert::same(FALSE, $t1->gte($t2));
+		Assert::same(FALSE, $t1->gte($t3));
+		Assert::same(TRUE, $t2->gte($t1));
+		Assert::same(TRUE, $t2->gte($t2));
+		Assert::same(FALSE, $t2->gte($t3));
+
+		// between
+		Assert::same(FALSE, $t1->between($t2, $t3));
+		Assert::same(TRUE, $t2->between($t1, $t3));
+		Assert::same(TRUE, $t2->between($t3, $t1));
+		Assert::same(FALSE, $t3->between($t1, $t2));
+		Assert::same(TRUE, $t1->between($t1, $t1)); // using <= and >= operators
+		Assert::same(FALSE, $t1->between($t1, $t1, TRUE)); // using < and > operators
 	}
 
 
@@ -103,145 +187,32 @@ class TimeTest extends Tester\TestCase
 
 		// default format is '?H:i:s'
 		Assert::same(Time::FORMAT_HMS, (new Time)->getFormat());
-		Assert::same('00:00:00', (string) new Time(0));
-		Assert::same('00:01:00', (string) new Time(60));
-		Assert::same('00:01:40', (string) new Time(100));
-		Assert::same('00:01:41', (string) new Time(101));
-		Assert::same('01:00:00', (string) new Time(3600));
-		Assert::same('01:01:40', (string) new Time(3700));
-		Assert::same('01:01:41', (string) new Time(3701));
+		Assert::same('00:00:00', (string) Time::fromSeconds(0));
+		Assert::same('00:01:00', (string) Time::fromSeconds(60));
+		Assert::same('00:01:40', (string) Time::fromSeconds(100));
+		Assert::same('00:01:41', (string) Time::fromSeconds(101));
+		Assert::same('01:00:00', (string) Time::fromSeconds(3600));
+		Assert::same('01:01:40', (string) Time::fromSeconds(3700));
+		Assert::same('01:01:41', (string) Time::fromSeconds(3701));
 
 		// not valid day time
-		Assert::same('-00:00:01', (string) new Time(-1));
-		Assert::same('24:00:00', (string) new Time(Time::DAY));
+		Assert::same('-00:00:01', (string) Time::fromSeconds(-1));
+		Assert::same('24:00:00', (string) Time::fromSeconds(Time::DAY));
 
 		// format with persistent signum
 		$plusFormat = Time::FORMAT_HMS_SIGNED;
-		Assert::same('+00:00:00', (string) (new Time(0))->setFormat($plusFormat));
-		Assert::same('+00:00:01', (string) (new Time(1))->setFormat($plusFormat));
-		Assert::same('-00:00:01', (string) (new Time(-1))->setFormat($plusFormat));
+		Assert::same('+00:00:00', (string) Time::fromSeconds(0)->setFormat($plusFormat));
+		Assert::same('+00:00:01', (string) Time::fromSeconds(1)->setFormat($plusFormat));
+		Assert::same('-00:00:01', (string) Time::fromSeconds(-1)->setFormat($plusFormat));
 
 		// AM / PM
-		Assert::same('12:00:00 AM', (string) (new Time(0))->setFormat(Time::FORMAT_HMSA)); // midnight
-		Assert::same('12:00:00 PM', (string) (new Time(12 * 60 * 60))->setFormat(Time::FORMAT_HMSA)); // noon / midday
-		Assert::same('11:59:59 AM', (string) (new Time(12 * 60 * 60 - 1))->setFormat(Time::FORMAT_HMSA));
-		Assert::same('11:59:59 PM', (string) (new Time(24 * 60 * 60 - 1))->setFormat(Time::FORMAT_HMSA));
-		Assert::same('12:00:01 PM', (string) (new Time(12 * 60 * 60 + 1))->setFormat(Time::FORMAT_HMSA));
-		Assert::same('12:00:01 AM', (string) (new Time(1))->setFormat(Time::FORMAT_HMSA));
+		Assert::same('12:00:00 AM', (string) Time::fromSeconds(0)->setFormat(Time::FORMAT_HMSA)); // midnight
+		Assert::same('12:00:00 PM', (string) Time::fromSeconds(12 * 60 * 60)->setFormat(Time::FORMAT_HMSA)); // noon / midday
+		Assert::same('11:59:59 AM', (string) Time::fromSeconds(12 * 60 * 60 - 1)->setFormat(Time::FORMAT_HMSA));
+		Assert::same('11:59:59 PM', (string) Time::fromSeconds(24 * 60 * 60 - 1)->setFormat(Time::FORMAT_HMSA));
+		Assert::same('12:00:01 PM', (string) Time::fromSeconds(12 * 60 * 60 + 1)->setFormat(Time::FORMAT_HMSA));
+		Assert::same('12:00:01 AM', (string) Time::fromSeconds(1)->setFormat(Time::FORMAT_HMSA));
 		//NOTE: there are no tests for invalid day time with 12h format as the behaviour is undefined
-	}
-
-
-	public function __testScalarOperations()
-	{
-		// operations are not supported - conversion of Node to scalar types is not possible
-		$i = new Node(1);
-		$s = new Node('string');
-
-		Assert::error(function()use($i) {
-			(int) $i;
-		}, E_NOTICE);
-		Assert::error(function()use($s) {
-			(string) $s;
-		}, E_RECOVERABLE_ERROR);
-	}
-
-
-	public function __testArray()
-	{
-		$array = [1, 2, 3];
-		$node = new Node($array);
-		Assert::same($array, $node->getObject());
-
-		// cannot call a function on an array
-		Assert::exception(function() use ($node) {
-			$node->foo();
-		}, 'BadMethodCallException');
-
-		// requesting $array['foo'] should raise E_NOTICE
-		Assert::error(function() use ($node) {
-			$node->foo;
-		}, E_NOTICE);
-
-		foreach (array_keys($array) as $key) {
-			Assert::same($array[$key], $node->{$key});
-		}
-
-		$clone = $array;
-		$node[] = 5;
-		$clone[] = 5;
-		Assert::same($clone, $node->getObject());
-
-		$node[100] = 'foo';
-		$clone[100] = 'foo';
-		Assert::same($clone, $node->getObject());
-
-		$node[''] = 6;
-		$clone[''] = 6;
-		Assert::same($clone, $node->getObject());
-
-		// this case is a known bug!
-		// cannot be solved without breaking the ability to add by calling $node[] = foo; (PHP 5.6)
-		$node[NULL] = 7;
-		$clone[NULL] = 7;
-		$buggy = [1, 2, 3, 5, 100 => 'foo', '' => 6, 7];
-		Assert::notSame($clone, $node->getObject()); // Assert::same will fail - see below
-		Assert::same($buggy, $node->getObject()); // $clone !== $buggy
-	}
-
-
-	public function __testObject()
-	{
-		$dataObject = new DataWrapper(10, 'foobar');
-		$node = new Node($dataObject);
-		Assert::same($dataObject, $node->getObject());
-
-		Assert::same('foobar', $node->title);
-		Assert::same('bar', $node->foo);
-
-		$node->scalar = 4;
-		$node->array = $array = [1, 2, 3, [10, 20, 30]];
-		$node->object = $object = new DataWrapper('fooId');
-
-		Assert::same(4, $node->scalar);
-		Assert::same($array, $node->array);
-		Assert::same($object, $node->object);
-
-		// modifying an index of $node->array should raise E_NOTICE - indirect modification
-		Assert::error(function() use ($node) {
-			$node->array[] = 'foo';
-		}, E_NOTICE, 'Indirect modification of overloaded property Oliva\Utils\Tree\Node\Node::$array has no effect');
-		Assert::error(function() use ($node) {
-			$node->array['foo'] = 'bar';
-		}, E_NOTICE, 'Indirect modification of overloaded property Oliva\Utils\Tree\Node\Node::$array has no effect');
-
-		// it works on objects though...
-		$object->scalar = 'success';
-		Assert::same('success', $node->object->scalar);
-
-		// test function calls
-		Assert::same($dataObject, $node->setAttribute('h1', '20px')); // oh, well... one would probably expect setAttribute() to return $node, but...
-		Assert::same($node->getAttribute('h1'), '20px');
-
-		// __call test
-		Assert::same('Calling "foobar" on an instance of "Oliva\Test\DataWrapper" with 0 arguments.', $node->foobar());
-		Assert::same('Calling "foobar2" on an instance of "Oliva\Test\DataWrapper" with 3 arguments.', $node->foobar2(1, 2, 6));
-	}
-
-
-	public function __testClonning()
-	{
-		$root = new Node('0');
-		$root->addChild(new Node(new DataWrapper('foo')));
-		$root->addChild(new Node('bar'));
-		$clone = clone $root;
-		Assert::equal(FALSE, $clone === $root);
-		Assert::equal(FALSE, $clone->getChild(0) === $root->getChild(0));
-		Assert::equal(TRUE, $clone->getChild(0)->getContents() === $root->getChild(0)->getContents()); // the data not clonned => identical
-		Assert::equal(TRUE, $clone->getChild(1)->getContents() === $root->getChild(1)->getContents()); // scalar data is identical
-		$clone->getChild(0)->cloneContents(); // clone the data
-		Assert::equal(FALSE, $clone->getChild(0)->getContents() === $root->getChild(0)->getContents()); // the data has been clonned
-		Assert::equal(TRUE, $clone->getChild(1)->getContents() === $root->getChild(1)->getContents()); // scalar data remains identical
 	}
 
 }
