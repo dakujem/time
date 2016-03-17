@@ -1,0 +1,34 @@
+{
+	"name": "dakujem/time",
+
+	"description": "Comming soon.",
+    "keywords": ["time","utilities","utility"],
+    "license": "GNU GPL v3",
+
+	"type": "library",
+	"authors": [
+		{
+			"name": "Andrej Rypak",
+			"email": "xrypak@gmail.com"
+		}
+	],
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/dakujem/time"
+		}
+	],
+	"require": {
+		"php": "^5.3 || ^7.0"
+	},
+	"require-dev": {
+		"php": "^5.4 || ^7.0",
+		"nette/tester": "~1.4.0",
+		"tracy/tracy": "~2.3.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Dakujem\\": "src/"
+		}
+	}
+}
