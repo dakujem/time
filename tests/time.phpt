@@ -9,11 +9,12 @@ namespace Dakujem\Test\Time;
 
 require_once __DIR__ . '/bootstrap.php';
 
-use Dakujem\Time;
-use Oliva\Test\DataWrapper;
-use Oliva\Utils\Tree\Node\Node;
-use Tester;
-use Tester\Assert;
+use Dakujem\Time,
+	Dakujem\TimeFactory,
+	Oliva\Test\DataWrapper,
+	Oliva\Utils\Tree\Node\Node,
+	Tester,
+	Tester\Assert;
 
 
 class TimeTest extends Tester\TestCase
@@ -38,6 +39,8 @@ class TimeTest extends Tester\TestCase
 
 		Assert::same($seconds, (new Time($seconds))->getSeconds());
 		Assert::same($seconds, Time::fromSeconds($seconds)->getSeconds());
+
+		Assert::same($seconds, (new TimeFactory)->create($seconds)->getSeconds());
 	}
 
 
@@ -90,8 +93,16 @@ class TimeTest extends Tester\TestCase
 
 	public function testFormatting()
 	{
+		// format constants
+		Assert::same('?H:i:s', Time::FORMAT_HMS);
+		Assert::same('+H:i:s', Time::FORMAT_HMS_SIGNED);
+		Assert::same('?H:i', Time::FORMAT_HM);
+		Assert::same('+H:i', Time::FORMAT_HM_SIGNED);
+		Assert::same('h:i:s A', Time::FORMAT_HMSA);
+		Assert::same('h:i A', Time::FORMAT_HMA);
+
 		// default format is '?H:i:s'
-		Assert::same('?H:i:s', (new Time)->getFormat());
+		Assert::same(Time::FORMAT_HMS, (new Time)->getFormat());
 		Assert::same('00:00:00', (string) new Time(0));
 		Assert::same('00:01:00', (string) new Time(60));
 		Assert::same('00:01:40', (string) new Time(100));
@@ -105,21 +116,19 @@ class TimeTest extends Tester\TestCase
 		Assert::same('24:00:00', (string) new Time(Time::DAY));
 
 		// format with persistent signum
-		$plusFormat = '+H:i:s';
+		$plusFormat = Time::FORMAT_HMS_SIGNED;
 		Assert::same('+00:00:00', (string) (new Time(0))->setFormat($plusFormat));
 		Assert::same('+00:00:01', (string) (new Time(1))->setFormat($plusFormat));
 		Assert::same('-00:00:01', (string) (new Time(-1))->setFormat($plusFormat));
 
-//
-//		// cannot call a function on a scalar
-//		Assert::exception(function() use ($node) {
-//			$node->foo();
-//		}, 'BadMethodCallException');
-//
-//		// cannot get/set a member of a scalar
-//		Assert::exception(function() use ($node) {
-//			$node->foo;
-//		}, 'RuntimeException');
+		// AM / PM
+		Assert::same('12:00:00 AM', (string) (new Time(0))->setFormat(Time::FORMAT_HMSA)); // midnight
+		Assert::same('12:00:00 PM', (string) (new Time(12 * 60 * 60))->setFormat(Time::FORMAT_HMSA)); // noon / midday
+		Assert::same('11:59:59 AM', (string) (new Time(12 * 60 * 60 - 1))->setFormat(Time::FORMAT_HMSA));
+		Assert::same('11:59:59 PM', (string) (new Time(24 * 60 * 60 - 1))->setFormat(Time::FORMAT_HMSA));
+		Assert::same('12:00:01 PM', (string) (new Time(12 * 60 * 60 + 1))->setFormat(Time::FORMAT_HMSA));
+		Assert::same('12:00:01 AM', (string) (new Time(1))->setFormat(Time::FORMAT_HMSA));
+		//NOTE: there are no tests for invalid day time with 12h format as the behaviour is undefined
 	}
 
 

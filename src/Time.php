@@ -17,12 +17,22 @@ class Time
 	const DAY = 86400; // 60 * 60 * 24
 	const WEEK = 604800; // 60 * 60 * 24 * 7
 
+	/**
+	 * @var int the time in seconds.
+	 */
 	private $time = NULL;
 
+	const FORMAT_HMS = '?H:i:s';
+	const FORMAT_HM = '?H:i';
+	const FORMAT_HMS_SIGNED = '+H:i:s';
+	const FORMAT_HM_SIGNED = '+H:i';
+	const FORMAT_HMSA = 'h:i:s A';
+	const FORMAT_HMA = 'h:i A';
+
 	/**
-	 * @var string recognized characters "?+HhisGgAa" - see php date() function for "HhisGgAa", '?' is used for the minus sign, '+' is used for minus and plus sign
+	 * @var string format, recognized characters "?+HhisGgAa" - see the Time::format() method
 	 */
-	private $format = '?H:i:s';
+	private $format = self::FORMAT_HMS;
 
 
 	public function __construct($time = NULL)
@@ -148,15 +158,15 @@ class Time
 	}
 
 
-	public function setFormatHoursMinutes()
+	public function useFormatHoursMinutes()
 	{
-		return $this->setFormat('?H:i');
+		return $this->setFormat(self::FORMAT_HM);
 	}
 
 
-	public function setFormatHoursMinutesSeconds()
+	public function useFormatHoursMinutesSeconds()
 	{
-		return $this->setFormat('?H:i:s');
+		return $this->setFormat(self::FORMAT_HMS);
 	}
 
 
@@ -222,25 +232,47 @@ class Time
 	}
 
 
-	// add, sub, porovnania, between
-	// toMinutes, toSeconds, toHours[, toDays, toWeeks]
-	// toCarbon, toDateTime
-	// clipToDay - oreze na 24 hodin, t.j. ak je cas vacsi ako 24 hod, zahodi zvysok (vytvori kopiu seba)
+	public function toDays()
+	{
+		return $this->time / self::DAY;
+	}
 
+
+	public function toWeeks()
+	{
+		return $this->time / self::WEEK;
+	}
+
+	//TODO toCarbon, toDateTime
+
+
+	/**
+	 * Format the time using the format provided.
+	 *
+	 * Recognized characters for format are "?+HhisGgAa".
+	 * - see php date() function for "HhisGgAa",
+	 * - '?' is used for the minus sign, only present when the time is negative
+	 * - '+' is used for minus and plus sign, always present
+	 *
+	 *
+	 * @param string $format
+	 * @return string formatted time
+	 */
 	public function format($format)
 	{
 		$neg = $this->isNegative();
+		$v = $this->isValidDayTime();
 		$h = $this->getHours();
+		$h12 = $v ? ($h % 12 === 0 ? 12 : $h % 12) : $h;
 		$m = $this->getMinutes();
 		$s = $this->getSeconds();
-		$v = $this->isValidDayTime();
 		return str_replace(['?', '+', 'H', 'h', 'G', 'g', 'i', 's', 'A', 'a'], [
 			$neg ? '-' : '', // ?
 			$neg ? '-' : '+', // +
 			sprintf('%02d', $h), // H
-			sprintf('%02d', $v ? $h % 12 : $h ), // h
+			sprintf('%02d', $h12), // h
 			$h, // G
-			$v ? $h % 12 : $h, // g
+			$h12, // g
 			sprintf('%02d', $m), // i
 			sprintf('%02d', $s), // s
 			$v ? ($h < 12 ? 'AM' : 'PM') : '', // A
@@ -249,6 +281,9 @@ class Time
 	}
 
 
+	/**
+	 * @todo custom callback formatter ??
+	 */
 	public function __toString()
 	{
 		return $this->format($this->getFormat());

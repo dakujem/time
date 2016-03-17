@@ -12,7 +12,7 @@ namespace Dakujem;
  */
 class TimeFactory
 {
-	private $format = '?H:i:s';
+	private $format = Time::FORMAT_HMS;
 
 
 	public function __construct($format = NULL)
@@ -23,7 +23,13 @@ class TimeFactory
 
 	public function create($time)
 	{
-		return new Time($time);
+		return $this->createEmpty()->setTime($time)->setFormat($this->getFormat());
+	}
+
+
+	public function createEmpty()
+	{
+		return new Time();
 	}
 
 
@@ -40,15 +46,15 @@ class TimeFactory
 	}
 
 
-	public function setFormatHoursMinutes()
+	public function useFormatHoursMinutes()
 	{
-		return $this->setFormat('?H:i');
+		return $this->setFormat(Time::FORMAT_HM);
 	}
 
 
-	public function setFormatHoursMinutesSeconds()
+	public function useFormatHoursMinutesSeconds()
 	{
-		return $this->setFormat('?H:i:s');
+		return $this->setFormat(Time::FORMAT_HMS);
 	}
 
 }
