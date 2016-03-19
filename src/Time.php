@@ -5,7 +5,6 @@ namespace Dakujem;
 
 use Carbon\Carbon;
 use DateTime;
-use DateTimeZone;
 use RuntimeException;
 
 
@@ -701,19 +700,33 @@ class Time
 		ksort($keys); // sort $keys according to occurence in $format
 		foreach ($keys as &$ref) {
 			// match the references in $keys with the values
-			$ref = (int) current($vals); // $vals contain values read from $value string
+			$ref = current($vals); // $vals contain values read from $value string
 			next($vals);
 		}
 
 		// 3/ -----------------------------------------------------------------------------------------
 		// correct negative values
 
-		if ($h < 0 && substr_count($format, '?') <= 1 && substr_count($format, '+') <= 1) {
+		$hneg = substr($h, 0, 1) === '-'; // hours negative
+		$mneg = substr($m, 0, 1) === '-'; // minutes negative
+		$sneg = substr($s, 0, 1) === '-'; // seconds negative
+		if (TRUE) {
+			$h = (int) $h;
+			$m = (int) $m;
+			$s = (int) $s;
+		}
+		if (substr_count($format, '?') <= 1 && substr_count($format, '+') <= 1) {
 			// this corrects the reading of times like -12:30, when format contains only one sign,
 			// consequently, -12:30 will result in -12 hours and -30 minutes time, when format is ?H:i
 			// when format is set as ?H:?i, this will not happen, and will result in time -11 hours and 30 minutes (-12 hours +30 minutes))
-			$m = $m < 0 ? $m : -$m;
-			$s = $s < 0 ? $s : -$s;
+			if ($hneg) {
+				$m = $mneg ? $m : -$m;
+				$s = $sneg ? $s : -$s;
+			} else {
+				$m = !$mneg ? $m : -$m;
+				$s = !$sneg ? $s : -$s;
+			}
+			//TODO this does not cover the case when format "?i:s" is used
 		}
 
 		// 4/ -----------------------------------------------------------------------------------------

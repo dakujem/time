@@ -279,8 +279,12 @@ class TimeTest extends Tester\TestCase
 		Assert::same(-1 * Time::HOUR + 30 * Time::MINUTE, Time::create('-1:30', '?H:?i')->toSeconds()); // the sign must be before hours and minutes
 		Assert::same(-1 * Time::HOUR - 30 * Time::MINUTE, Time::create('-1:-30', '?H:?i')->toSeconds()); // now the reading is as (probably) expected above
 		Assert::same(1 * Time::HOUR - 30 * Time::MINUTE, Time::create('1:-30', '?H:?i')->toSeconds());
+		Assert::same(-1, Time::create('-0:00:01')->toSeconds());
+		Assert::same(-61, Time::create('-0:01:-01')->toSeconds());
+//		Assert::same(-1, Time::create('-0:01', '?i:s')->toSeconds()); //TODO fix this !
 		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12, Time::create('-123:34:12')->toSeconds());
 		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12, Time::create('-123:-34:+12')->toSeconds()); // only the hour sign matters here!
+		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE + 12, Time::create('+123:-34:+12')->toSeconds()); // only the hour sign matters here!
 		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE + 12, Time::create('-123:-34:+12', '?H:?i:?s')->toSeconds()); // every sign matters
 		/**/
 		// strange formats
