@@ -66,11 +66,26 @@ class TimeTest extends Tester\TestCase
 	public function testFactories()
 	{
 		$seconds = 14;
+		$format = Time::FORMAT_HMS;
 
+		// constructor
 		Assert::same($seconds, (new Time($seconds))->toSeconds());
+		Assert::same($seconds, (new Time($seconds, $format))->toSeconds());
+		Assert::same($seconds, (new Time('00:00:' . $seconds, $format))->toSeconds());
+
+		// universal factory
+		Assert::same($seconds, Time::create($seconds)->toSeconds());
+
+		// from *
 		Assert::same($seconds, Time::fromSeconds($seconds)->toSeconds());
 
+		// copy
+		Assert::same($seconds, Time::create($seconds)->copy()->toSeconds());
+
+		// time factory
 		Assert::same($seconds, (new TimeFactory)->create($seconds)->toSeconds());
+
+		//TODO ->set()
 	}
 
 
@@ -160,6 +175,27 @@ class TimeTest extends Tester\TestCase
 		$t->add(Time::fromSeconds(6)); // 0+6
 		Assert::same(2, $t->mod(4)->toSeconds()); // 6 % 4
 		Assert::same(-1 % 4, Time::fromSeconds(-1)->mod(4)->toSeconds());
+	}
+
+
+	public function testAlterations()
+	{
+		$t = Time::create();
+
+		Assert::same(2, $t->copy()->addSeconds(2)->toSeconds());
+		Assert::same(2, $t->copy()->addMinutes(2)->toMinutes());
+		Assert::same(2, $t->copy()->addHours(2)->toHours());
+		Assert::same(2, $t->copy()->addDays(2)->toDays());
+		Assert::same(2, $t->copy()->addWeeks(2)->toWeeks());
+
+		Assert::same(-2, $t->copy()->subSeconds(2)->toSeconds());
+		Assert::same(-2, $t->copy()->subMinutes(2)->toMinutes());
+		Assert::same(-2, $t->copy()->subHours(2)->toHours());
+		Assert::same(-2, $t->copy()->subDays(2)->toDays());
+		Assert::same(-2, $t->copy()->subWeeks(2)->toWeeks());
+
+		Assert::same(-2, $t->copy()->addSeconds(-2)->toSeconds());
+		Assert::same(2, $t->copy()->subSeconds(-2)->toSeconds());
 	}
 
 
