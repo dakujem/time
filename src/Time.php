@@ -17,7 +17,6 @@ use RuntimeException;
  *
  *
  * @todo: toCarbon, toDateTime
- * @todo: addDays, addWeeks, addHours...
  *
  * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
  */
@@ -62,7 +61,7 @@ class Time
 	 */
 	public function add($time)
 	{
-		return $this->_setSeconds($this->toSeconds() + $this->parse($time));
+		return $this->_set($this->toSeconds() + $this->parse($time));
 	}
 
 
@@ -75,7 +74,7 @@ class Time
 	 */
 	public function sub($time)
 	{
-		return $this->_setSeconds($this->toSeconds() - $this->parse($time));
+		return $this->_set($this->toSeconds() - $this->parse($time));
 	}
 
 
@@ -88,7 +87,7 @@ class Time
 	 */
 	public function mult($x)
 	{
-		return $this->_setSeconds($this->toSeconds() * $x);
+		return $this->_set($this->toSeconds() * $x);
 	}
 
 
@@ -101,7 +100,7 @@ class Time
 	 */
 	public function div($x)
 	{
-		return $this->_setSeconds($this->toSeconds() / $x);
+		return $this->_set($this->toSeconds() / $x);
 	}
 
 
@@ -114,7 +113,7 @@ class Time
 	 */
 	public function mod($x)
 	{
-		return $this->_setSeconds($this->toSeconds() % $x);
+		return $this->_set($this->toSeconds() % $x);
 	}
 
 
@@ -246,7 +245,7 @@ class Time
 	public function clipToDayTime()
 	{
 		$t = $this->toSeconds() % self::DAY;
-		return $this->_setSeconds($t < 0 ? $t + self::DAY : $t);
+		return $this->_set($t < 0 ? $t + self::DAY : $t);
 	}
 
 
@@ -275,52 +274,85 @@ class Time
 	}
 
 
+	/**
+	 * Set the time.
+	 * The input is parsed.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time
+	 * @param string|NULL $format
+	 * @return self fluent
+	 */
 	public function set($time, $format = NULL)
 	{
 		return $this->_set($this->parse($time, $format));
 	}
 
 
+	private function _set($value)
+	{
+		$this->time = $value === NULL ? NULL : (int) $value;
+		return $this;
+	}
+
+
 	public function addSeconds($seconds = 1)
 	{
-		return $this->_setSeconds($this->toSeconds() + $seconds);
+		return $this->_set($this->toSeconds() + $seconds);
 	}
 
 
 	public function addMinutes($minutes = 1)
 	{
-		return $this->_setSeconds($this->toSeconds() + $minutes * self::MINUTE);
+		return $this->_set($this->toSeconds() + $minutes * self::MINUTE);
 	}
 
 
 	public function addHours($hours = 1)
 	{
-		return $this->_setSeconds($this->toSeconds() + $hours * self::HOUR);
+		return $this->_set($this->toSeconds() + $hours * self::HOUR);
 	}
 
 
 	public function addDays($days = 1)
 	{
-		return $this->_setSeconds($this->toSeconds() + $days * self::DAY);
+		return $this->_set($this->toSeconds() + $days * self::DAY);
 	}
 
 
 	public function addWeeks($weeks = 1)
 	{
-		return $this->_setSeconds($this->toSeconds() + $weeks * self::WEEK);
+		return $this->_set($this->toSeconds() + $weeks * self::WEEK);
 	}
 
 
-	private function _set($value)
+	public function subSeconds($seconds = 1)
 	{
-		$this->time = $value;
-		return $this;
+		return $this->addSeconds($seconds * -1);
 	}
 
 
-	private function _setSeconds($value)
+	public function subMinutes($minutes = 1)
 	{
-		return $this->_set((int) $value);
+		return $this->addMinutes($minutes * -1);
+	}
+
+
+	public function subHours($hours = 1)
+	{
+		return $this->addHours($hours * -1);
+	}
+
+
+	public function subDays($days = 1)
+	{
+		return $this->addDays($days * -1);
+	}
+
+
+	public function subWeeks($weeks = 1)
+	{
+		return $this->addWeeks($weeks * -1);
 	}
 
 
@@ -539,16 +571,11 @@ class Time
 			$m = next($time) * self::MINUTE;
 			$s = next($time);
 			return $h + $m + $s;
-		} elseif ($time instanceof Carbon || $time instanceof DateTime) {
+		} elseif (/* $time instanceof Carbon || */ $time instanceof DateTime) { // note: carbon descends from DateTime
 			return $this->parse($time->format('H:i:s'));
 		}
 		throw new RuntimeException('Invalid argument passed.');
 	}
-
-
-	// set() by malo nastavit cas pomocou volania parse()
-	// parse() by malo vracat sekundy
-	// _set moze byt ako interny setter
 
 
 	private function parseFormat($value, $format)
