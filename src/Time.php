@@ -266,31 +266,6 @@ class Time
 	}
 
 
-	public function getFormat()
-	{
-		return $this->format;
-	}
-
-
-	public function setFormat($format)
-	{
-		$this->format = $format;
-		return $this;
-	}
-
-
-	public function useFormatHoursMinutes()
-	{
-		return $this->setFormat(self::FORMAT_HM);
-	}
-
-
-	public function useFormatHoursMinutesSeconds()
-	{
-		return $this->setFormat(self::FORMAT_HMS);
-	}
-
-
 	/**
 	 * Set the time.
 	 * The input is parsed.
@@ -306,6 +281,14 @@ class Time
 	}
 
 
+	/**
+	 * Internal setter.
+	 *
+	 *
+	 * @internal
+	 * @param int|NULL $value
+	 * @return self fluent
+	 */
 	private function _set($value)
 	{
 		$this->time = $value === NULL ? NULL : (int) $value;
@@ -531,6 +514,56 @@ class Time
 
 
 	/**
+	 * Get the default output and input time format.
+	 *
+	 *
+	 * @return string
+	 */
+	public function getFormat()
+	{
+		return $this->format;
+	}
+
+
+	/**
+	 * Set the default output and input time format.
+	 *
+	 *
+	 * @param string $format
+	 * @return self fluent
+	 */
+	public function setFormat($format)
+	{
+		$this->format = $format;
+		return $this;
+	}
+
+
+	/**
+	 * Set the default output and input time format to hours:minutes (HH:MM)
+	 *
+	 *
+	 * @return self fluent
+	 */
+	public function useFormatHoursMinutes()
+	{
+		return $this->setFormat(self::FORMAT_HM);
+	}
+
+
+	/**
+	 * Set the default output and input time format to hours:minutes:seconds (HH:MM:SS).
+	 *
+	 *
+	 * @return self fluent
+	 */
+	public function useFormatHoursMinutesSeconds()
+	{
+		return $this->setFormat(self::FORMAT_HMS);
+	}
+
+
+	/**
 	 * Format the time using the format provided.
 	 *
 	 * The Time::FORMAT_* constants can be used to format the time to most used time formats.
@@ -576,18 +609,6 @@ class Time
 
 
 	/**
-	 * Create and return a copy of self.
-	 *
-	 *
-	 * @return self a copy of the original Time object, for fluent calls
-	 */
-	public function copy()
-	{
-		return clone $this;
-	}
-
-
-	/**
 	 * Returns the time in seconds or NULL.
 	 *
 	 *
@@ -627,6 +648,18 @@ class Time
 		//TODO reimplement using custom format reading...
 		$tz = new DateTimeZone('UTC');
 		return (new DateTime($value, $tz))->getTimestamp() - (new DateTime('00:00:00', $tz))->getTimestamp();
+	}
+
+
+	/**
+	 * Create and return a copy of self.
+	 *
+	 *
+	 * @return self a copy of the original Time object, for fluent calls
+	 */
+	public function copy()
+	{
+		return clone $this;
 	}
 
 
