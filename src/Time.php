@@ -645,7 +645,9 @@ class Time
 			$m = next($time) * self::MINUTE;
 			$s = next($time);
 			return $h + $m + $s;
-		} elseif (/* $time instanceof Carbon || */ $time instanceof DateTime) { // note: carbon descends from DateTime
+		} elseif ($time instanceof Carbon) {
+			return $this->parse(array($time->hour, $time->minute, $time->second));
+		} elseif ($time instanceof DateTime) {
 			return $this->parse($time->format('H:i:s'));
 		}
 		throw new RuntimeException('Invalid argument passed.');

@@ -9,10 +9,12 @@ namespace Dakujem\Test\Time;
 
 require_once __DIR__ . '/bootstrap.php';
 
-use Dakujem\Time,
-	Dakujem\TimeFactory,
-	Tester,
-	Tester\Assert;
+use Carbon\Carbon;
+use Dakujem\Time;
+use Dakujem\TimeFactory;
+use DateTime;
+use Tester;
+use Tester\Assert;
 
 
 class TimeTest extends Tester\TestCase
@@ -298,7 +300,13 @@ class TimeTest extends Tester\TestCase
 		Assert::same(1 * Time::MINUTE, Time::create('1:2:3', 'i')->toSeconds());
 		Assert::same(1, Time::create('1:2:3', 's')->toSeconds());
 
-		//TODO test carbon / datetime
+		// test Carbon
+		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(Carbon::createFromFormat('H:i:s', '1:02:03'))->toSeconds());
+		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(Carbon::createFromFormat('H:i:s', '24:02:03'))->toSeconds()); // this results in 00:02:03 the next day in Carbon
+		/**/
+		// test DateTime
+		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(new DateTime('1:02:03'))->toSeconds());
+		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(new DateTime('24:02:03'))->toSeconds());
 	}
 
 }
