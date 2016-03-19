@@ -32,6 +32,36 @@ class TimeTest extends Tester\TestCase
 	}
 
 
+	public function testConstants()
+	{
+		// time constants
+		Assert::same(60, Time::MINUTE);
+		Assert::same(60, Time::HOUR_MINUTES);
+		Assert::same(24, Time::DAY_HOURS);
+		Assert::same(7, Time::WEEK_DAYS);
+
+		// calculated time constants (seconds)
+		Assert::same(Time::HOUR_MINUTES * Time::MINUTE, Time::HOUR);
+		Assert::same(Time::DAY_HOURS * Time::HOUR, Time::DAY);
+		Assert::same(Time::WEEK_DAYS * Time::DAY, Time::WEEK);
+
+		// calculated time constants (minutes)
+		Assert::same(Time::DAY_HOURS * Time::MINUTE, Time::DAY_MINUTES);
+		Assert::same(Time::WEEK_DAYS * Time::DAY_MINUTES, Time::WEEK_MINUTES);
+
+		// calculated time constants (hours)
+		Assert::same(Time::WEEK_DAYS * Time::DAY_HOURS, Time::WEEK_HOURS);
+
+		// format constants
+		Assert::same('?H:i:s', Time::FORMAT_HMS);
+		Assert::same('+H:i:s', Time::FORMAT_HMS_SIGNED);
+		Assert::same('?H:i', Time::FORMAT_HM);
+		Assert::same('+H:i', Time::FORMAT_HM_SIGNED);
+		Assert::same('h:i:s A', Time::FORMAT_HMSA);
+		Assert::same('h:i A', Time::FORMAT_HMA);
+	}
+
+
 	public function testFactories()
 	{
 		$seconds = 14;
@@ -192,14 +222,6 @@ class TimeTest extends Tester\TestCase
 
 	public function testFormatting()
 	{
-		// format constants
-		Assert::same('?H:i:s', Time::FORMAT_HMS);
-		Assert::same('+H:i:s', Time::FORMAT_HMS_SIGNED);
-		Assert::same('?H:i', Time::FORMAT_HM);
-		Assert::same('+H:i', Time::FORMAT_HM_SIGNED);
-		Assert::same('h:i:s A', Time::FORMAT_HMSA);
-		Assert::same('h:i A', Time::FORMAT_HMA);
-
 		// default format is '?H:i:s'
 		Assert::same(Time::FORMAT_HMS, (new Time)->getFormat());
 		Assert::same('00:00:00', (string) new Time); // uninitialized time
