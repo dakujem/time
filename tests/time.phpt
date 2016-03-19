@@ -11,7 +11,6 @@ require_once __DIR__ . '/bootstrap.php';
 
 use Dakujem\Time,
 	Dakujem\TimeFactory,
-	Exception,
 	Tester,
 	Tester\Assert;
 
@@ -256,25 +255,44 @@ class TimeTest extends Tester\TestCase
 
 	public function testParsing()
 	{
+		// valid 24-hour format time
 		Assert::same('12:34:56', (string) Time::create('12:34:56'));
 		Assert::same(45296, Time::create('12:34:56')->toSeconds());
 		Assert::same(300, Time::create('00:05')->toSeconds());
 		Assert::same(300, Time::create('0:5')->toSeconds());
 		Assert::same(5, Time::create('00:00:05')->toSeconds());
 		Assert::same(5, Time::create('0:0:5')->toSeconds());
-		Assert::same(45000, Time::create('12:30 PM')->toSeconds());
-		Assert::same(1800, Time::create('12:30 AM')->toSeconds());
 
-		//TODO for now invalid day times cannot be parsed
-		Assert::error(function() {
-			Assert::same(45296, Time::create('123:34')->toSeconds());
-		}, Exception::CLASS);
-		Assert::error(function() {
-			Assert::same(45296, Time::create('-123:34:12')->toSeconds());
-		}, Exception::CLASS);
-		Assert::error(function() {
-			Assert::same(45296, Time::create('-123:34:12')->toSeconds());
-		}, Exception::CLASS);
+		// 12-hour time
+		Assert::same(45000, Time::create('12:30 PM', Time::FORMAT_HMSA)->toSeconds());
+		Assert::same(1800, Time::create('12:30 AM', Time::FORMAT_HMSA)->toSeconds());
+		Assert::same(45000, Time::create('PM 12:30', Time::FORMAT_HMSA)->toSeconds());
+		Assert::same(1800, Time::create('AM 12:30', Time::FORMAT_HMSA)->toSeconds());
+		Assert::same(41404, Time::create('AM 11:30:04', Time::FORMAT_HMSA)->toSeconds());
+		Assert::same(NULL, Time::create('13:30 AM', Time::FORMAT_HMSA)->toSeconds()); // not a valid 12-h time
+		Assert::same(NULL, Time::create('-1:30 AM', Time::FORMAT_HMSA)->toSeconds()); // not a valid 12-h time
+		/**/
+		// not valid day times
+		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE, Time::create('123:34')->toSeconds());
+		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE + 56, Time::create('123:34:56')->toSeconds());
+		Assert::same(-1 * Time::HOUR - 30 * Time::MINUTE, Time::create('-1:30', '?H:i')->toSeconds());
+		Assert::same(-1 * Time::HOUR + 30 * Time::MINUTE, Time::create('-1:30', '?H:?i')->toSeconds()); // the sign must be before hours and minutes
+		Assert::same(-1 * Time::HOUR - 30 * Time::MINUTE, Time::create('-1:-30', '?H:?i')->toSeconds()); // now the reading is as (probably) expected above
+		Assert::same(1 * Time::HOUR - 30 * Time::MINUTE, Time::create('1:-30', '?H:?i')->toSeconds());
+		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12, Time::create('-123:34:12')->toSeconds());
+		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12, Time::create('-123:-34:+12')->toSeconds()); // only the hour sign matters here!
+		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE + 12, Time::create('-123:-34:+12', '?H:?i:?s')->toSeconds()); // every sign matters
+		/**/
+		// strange formats
+		Assert::same(-1 * Time::HOUR + 30, Time::create('-1:30', '?H:?s')->toSeconds());
+		Assert::same(-1 * Time::HOUR - 30, Time::create('-1:30', 'H:s')->toSeconds());
+		Assert::same(2 * Time::HOUR + 1, Time::create('1:2', 's:H')->toSeconds());
+		Assert::same(2 * Time::MINUTE + 1, Time::create('1:2', 's:i')->toSeconds());
+		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create('3:2:1', 's:i:H')->toSeconds());
+		Assert::same(1 * Time::HOUR + 3 * Time::MINUTE + 2, Time::create('3:2:1', 'i:s:H')->toSeconds());
+		Assert::same(1 * Time::HOUR, Time::create('1:2:3', 'H')->toSeconds());
+		Assert::same(1 * Time::MINUTE, Time::create('1:2:3', 'i')->toSeconds());
+		Assert::same(1, Time::create('1:2:3', 's')->toSeconds());
 
 		//TODO test carbon / datetime
 	}

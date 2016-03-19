@@ -653,11 +653,103 @@ class Time
 	}
 
 
+	/**
+	 * @todo sign handling should be improved
+	 */
 	private function parseFormat($value, $format)
 	{
-		//TODO reimplement using custom format reading...
-		$tz = new DateTimeZone('UTC');
-		return (new DateTime($value, $tz))->getTimestamp() - (new DateTime('00:00:00', $tz))->getTimestamp();
+		// 1/ -----------------------------------------------------------------------------------------
+		// read the numbers form the input string
+
+		$numbers = NULL;
+		if (!preg_match('#([+-]?[0-9]+)(.([+-]?[0-9]+)?(.([+-]?[0-9]+)?)?)?#', $value, $numbers)) { // PREG_OFFSET_CAPTURE
+			return NULL;
+		}
+		$hi = 1;
+		$mi = 3;
+		$si = 5;
+		// $vals contain the first, second and third number found in the $value string
+		$vals = [
+			isset($numbers[$hi]) ? $numbers[$hi] : 0,
+			isset($numbers[$mi]) ? $numbers[$mi] : 0,
+			isset($numbers[$si]) ? $numbers[$si] : 0,
+		];
+
+		// 2/ -----------------------------------------------------------------------------------------
+		// according to the format string, decide which numbers denote hours, minutes and seconds
+
+		$hpos1 = stripos($format, 'h');
+		$hpos = $hpos1 !== FALSE ? $hpos1 : stripos($format, 'g');
+		$ipos = stripos($format, 'i');
+		$spos = stripos($format, 's');
+		// hpos, ipos, spos contain the position in $format
+		if ($hpos === FALSE && $ipos === FALSE && $spos === FALSE) {
+			return NULL;
+		}
+		// $keys contain valid references to hours, minutes and seconds
+		$h = $m = $s = 0;
+		$keys = [];
+		if ($hpos !== FALSE) {
+			$keys[$hpos] = &$h; // reference to hours
+		}
+		if ($ipos !== FALSE) {
+			$keys[$ipos] = &$m; // reference to minutes
+		}
+		if ($spos !== FALSE) {
+			$keys[$spos] = &$s; // reference to seconds
+		}
+		ksort($keys); // sort $keys according to occurence in $format
+		foreach ($keys as &$ref) {
+			// match the references in $keys with the values
+			$ref = (int) current($vals); // $vals contain values read from $value string
+			next($vals);
+		}
+
+		// 3/ -----------------------------------------------------------------------------------------
+		// correct negative values
+
+		if ($h < 0 && substr_count($format, '?') <= 1 && substr_count($format, '+') <= 1) {
+			// this corrects the reading of times like -12:30, when format contains only one sign,
+			// consequently, -12:30 will result in -12 hours and -30 minutes time, when format is ?H:i
+			// when format is set as ?H:?i, this will not happen, and will result in time -11 hours and 30 minutes (-12 hours +30 minutes))
+			$m = $m < 0 ? $m : -$m;
+			$s = $s < 0 ? $s : -$s;
+		}
+
+		// 4/ -----------------------------------------------------------------------------------------
+		// check for and correct the 12-hour format (if used)
+
+		$f12h = stripos($format, 'a') !== FALSE; // check for 12-h format?
+		if ($f12h) {
+			if ($h > 12 || $h < 0) { // invalid 12h format
+				return NULL;
+			}
+			$a = stripos($value, 'am');
+			if ($a === FALSE) {
+				$p = stripos($value, 'pm');
+				if ($p !== FALSE) {
+					$am = FALSE;
+				} else {
+					return NULL; // AM or PM not found
+				}
+			} else {
+				$am = TRUE;
+			}
+			// now $am contains am/pm, correct the time
+			if ($h == 12 && $am) {
+				$h = 0;
+			} elseif ($h != 12 && !$am) {
+				$h = $h + 12; // PM
+			}
+		}
+
+		// 5/ -----------------------------------------------------------------------------------------
+		// return the result
+
+		return
+				$h * self::HOUR +
+				$m * self::MINUTE +
+				$s;
 	}
 
 
