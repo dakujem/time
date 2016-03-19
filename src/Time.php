@@ -3,18 +3,27 @@
 
 namespace Dakujem;
 
+use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 use RuntimeException;
 
 
 /**
  * Time.
  *
- * 
- * @author Andrej Rypak <xrypak@gmail.com>
+ *
+ * Note: internally, the time is kept in seconds, so the minimum resolution is one second.
+ *
+ *
+ * @todo: toCarbon, toDateTime
+ * @todo: addDays, addWeeks, addHours...
+ *
+ * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
  */
 class Time
 {
-	const MIN = 60;
+	const MINUTE = 60;
 	const HOUR = 3600; //   60 * 60
 	const DAY = 86400; //   60 * 60 * 24
 	const WEEK = 604800; // 60 * 60 * 24 * 7
@@ -37,23 +46,36 @@ class Time
 	private $format = self::FORMAT_HMS;
 
 
-	public function __construct($time = NULL)
+	public function __construct($time = NULL, $format = NULL)
 	{
-		$time !== NULL && $this->parseTime($time);
+		$time !== NULL && $this->set($time, $format);
+		$format !== NULL && $this->setFormat($format);
 	}
 
 
-	public function add(self $time)
+	/**
+	 * Add given time value.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return self
+	 */
+	public function add($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->parseTime($this->toSeconds() + $time->toSeconds());
+		return $this->_setSeconds($this->toSeconds() + $this->parse($time));
 	}
 
 
-	public function sub(self $time)
+	/**
+	 * Substract given time value.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return self
+	 */
+	public function sub($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->parseTime($this->toSeconds() - $time->toSeconds());
+		return $this->_setSeconds($this->toSeconds() - $this->parse($time));
 	}
 
 
@@ -66,7 +88,7 @@ class Time
 	 */
 	public function mult($x)
 	{
-		return $this->parseTime($this->toSeconds() * $x);
+		return $this->_setSeconds($this->toSeconds() * $x);
 	}
 
 
@@ -79,7 +101,7 @@ class Time
 	 */
 	public function div($x)
 	{
-		return $this->parseTime($this->toSeconds() / $x);
+		return $this->_setSeconds($this->toSeconds() / $x);
 	}
 
 
@@ -92,80 +114,139 @@ class Time
 	 */
 	public function mod($x)
 	{
-		return $this->parseTime($this->toSeconds() % $x);
+		return $this->_setSeconds($this->toSeconds() % $x);
 	}
 
 
-	public function lt(self $time)
+	/**
+	 * Perform a less-than comparison.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return bool
+	 */
+	public function lt($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->toSeconds() < $time->toSeconds();
+		return $this->toSeconds() < $this->parse($time);
 	}
 
 
-	public function lte(self $time)
+	/**
+	 * Perform a less-than-or-equal comparison.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return bool
+	 */
+	public function lte($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->toSeconds() <= $time->toSeconds();
+		return $this->toSeconds() <= $this->parse($time);
 	}
 
 
-	public function gt(self $time)
+	/**
+	 * Perform a greater-than comparison.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return bool
+	 */
+	public function gt($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->toSeconds() > $time->toSeconds();
+		return $this->toSeconds() > $this->parse($time);
 	}
 
 
-	public function gte(self $time)
+	/**
+	 * Perform a greater-than-or-equal comparison.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return bool
+	 */
+	public function gte($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->toSeconds() >= $time->toSeconds();
+		return $this->toSeconds() >= $this->parse($time);
 	}
 
 
-	public function eq(self $time)
+	/**
+	 * Perform a equal-to comparison.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return bool
+	 */
+	public function eq($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->toSeconds() === $time->toSeconds();
+		return $this->toSeconds() === $this->parse($time);
 	}
 
 
-	public function neq(self $time)
+	/**
+	 * Perform a not-equal-to comparison.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @return bool
+	 */
+	public function neq($time)
 	{
-		//TODO param has to be a Time instance ??
-		return $this->toSeconds() !== $time->toSeconds();
+		return $this->toSeconds() !== $this->parse($time);
 	}
 
 
-	public function between(self $time1, self $time2, $sharp = FALSE)
+	/**
+	 * Return TRUE when the time is within the interval defined by the given times.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time1 any parsable time format
+	 * @param int|string|self|DateTime|Carbon $time2 any parsable time format
+	 * @param bool $sharp [=FALSE] exclude the extremes of the interval?
+	 * @return bool
+	 */
+	public function between($time1, $time2, $sharp = FALSE)
 	{
-		//TODO params have to be Time instances ??
-		if ($time1->lte($time2)) {
-			$from = $time1;
-			$to = $time2;
+		$t1 = $this->parse($time1);
+		$t2 = $this->parse($time2);
+		if ($t1 <= $t2) {
+			$from = $t1;
+			$to = $t2;
 		} else {
-			$from = $time2;
-			$to = $time1;
+			$from = $t2;
+			$to = $t1;
 		}
 		return
 				$sharp ?
-				$this->toSeconds() > $from->toSeconds() && $this->toSeconds() < $to->toSeconds() :
-				$this->toSeconds() >= $from->toSeconds() && $this->toSeconds() <= $to->toSeconds();
+				$this->toSeconds() > $from && $this->toSeconds() < $to :
+				$this->toSeconds() >= $from && $this->toSeconds() <= $to;
 	}
 
 
+	/**
+	 * Is the time a valid day time?
+	 * e.g. Is the time between 00:00:00 and 23:59:59 ?
+	 *
+	 *
+	 * @return bool
+	 */
 	public function isValidDayTime()
 	{
 		return $this->toSeconds() >= 0 && $this->toSeconds() < self::DAY;
 	}
 
 
+	/**
+	 * Clip the time to a valid day time between 00:00:00 and 23:59:59.
+	 * This will perform a modulo-DAY operation.
+	 *
+	 *
+	 * @return self containing time between 00:00:00 and 23:59:59
+	 */
 	public function clipToDayTime()
 	{
-		//TODO should this create a new instance?
 		$t = $this->toSeconds() % self::DAY;
-		return static::fromSeconds($t < 0 ? $t + self::DAY : $t);
+		return $this->_setSeconds($t < 0 ? $t + self::DAY : $t);
 	}
 
 
@@ -194,74 +275,183 @@ class Time
 	}
 
 
-	public function setTime($time)
+	public function set($time, $format = NULL)
 	{
-		//TODO
-		return $this->setSeconds($time);
+		return $this->_set($this->parse($time, $format));
 	}
 
 
-//	public function setSeconds($seconds)
-//	{
-//		$this->time = (int) $seconds;
-//		return $this;
-//	}
+	public function addSeconds($seconds = 1)
+	{
+		return $this->_setSeconds($this->toSeconds() + $seconds);
+	}
 
 
+	public function addMinutes($minutes = 1)
+	{
+		return $this->_setSeconds($this->toSeconds() + $minutes * self::MINUTE);
+	}
+
+
+	public function addHours($hours = 1)
+	{
+		return $this->_setSeconds($this->toSeconds() + $hours * self::HOUR);
+	}
+
+
+	public function addDays($days = 1)
+	{
+		return $this->_setSeconds($this->toSeconds() + $days * self::DAY);
+	}
+
+
+	public function addWeeks($weeks = 1)
+	{
+		return $this->_setSeconds($this->toSeconds() + $weeks * self::WEEK);
+	}
+
+
+	private function _set($value)
+	{
+		$this->time = $value;
+		return $this;
+	}
+
+
+	private function _setSeconds($value)
+	{
+		return $this->_set((int) $value);
+	}
+
+
+	/**
+	 * Indicate whether the time is negative or not.
+	 *
+	 *
+	 * @return bool TRUE for any negative value, FALSE for positive and zero time
+	 */
 	public function isNegative()
 	{
 		return $this->toSeconds() < 0;
 	}
 
 
+	/**
+	 * Returns -1 when the time is negative, 0 when it is zero, +1 when it is positive.
+	 *
+	 *
+	 * @return int
+	 */
+	public function getSignum()
+	{
+		$s = $this->toSeconds();
+		return $s < 0 ? -1 : ($s === 0 ? 0 : 1);
+	}
+
+
+	/**
+	 * Return the seconds part of the time.
+	 * WARNING: this does not return the time converted to seconds! For that purpose, use the toSeconds() method.
+	 *
+	 *  HH:MM:SS
+	 *        \/
+	 *
+	 * @return int
+	 */
 	public function getSeconds()
 	{
-		return abs($this->time % self::MIN);
+		return (int) abs($this->toSeconds() % self::MINUTE);
 	}
 
 
+	/**
+	 * Return the minute part of the time.
+	 * WARNING: this does not return the time converted to minutes! For that purpose, use the toMinutes() method.
+	 *
+	 *  HH:MM:SS
+	 *     \/
+	 *
+	 * @return int
+	 */
 	public function getMinutes()
 	{
-		return abs(((int) ($this->time / self::MIN)) % self::MIN);
+		return (int) abs(((int) ($this->toSeconds() / self::MINUTE)) % self::MINUTE);
 	}
 
 
+	/**
+	 * Return the hour part of the time.
+	 * WARNING: this does not return the time converted to hours! For that purpose, use the toHours() method.
+	 *
+	 *  HH:MM:SS
+	 *  \/
+	 *
+	 * @return int
+	 */
 	public function getHours()
 	{
-		return abs((int) ($this->time / self::HOUR));
+		return (int) abs((int) ($this->toSeconds() / self::HOUR));
 	}
 
 
+	/**
+	 * Return the time in seconds.
+	 *
+	 *
+	 * @return int
+	 */
 	public function toSeconds()
 	{
 		return $this->time;
 	}
 
 
+	/**
+	 * Return the time in minutes.
+	 *
+	 *
+	 * @return int|double
+	 */
 	public function toMinutes()
 	{
-		return $this->time / self::MIN;
+		return $this->toSeconds() / self::MINUTE;
 	}
 
 
+	/**
+	 * Return the time in hours.
+	 *
+	 *
+	 * @return int|double
+	 */
 	public function toHours()
 	{
-		return $this->time / self::HOUR;
+		return $this->toSeconds() / self::HOUR;
 	}
 
 
+	/**
+	 * Return the time in days.
+	 *
+	 *
+	 * @return int|double
+	 */
 	public function toDays()
 	{
-		return $this->time / self::DAY;
+		return $this->toSeconds() / self::DAY;
 	}
 
 
+	/**
+	 * Return the time in weeks.
+	 *
+	 *
+	 * @return int|double
+	 */
 	public function toWeeks()
 	{
-		return $this->time / self::WEEK;
+		return $this->toSeconds() / self::WEEK;
 	}
-
-	//TODO toCarbon, toDateTime
 
 
 	/**
@@ -309,60 +499,63 @@ class Time
 	}
 
 
+	/**
+	 * Create and return a copy of self.
+	 *
+	 *
+	 * @return self a copy of the original Time object, for fluent calls
+	 */
 	public function copy()
 	{
 		return clone $this;
 	}
 
 
-	public function parseTime($time, $format = NULL)
+	/**
+	 * Returns the time in seconds or NULL.
+	 *
+	 *
+	 * @param mixed $time
+	 * @param string|NULL $format
+	 * @return int|NULL returns NULL when the time passed is NULL or an empty string
+	 * @throws RuntimeException
+	 */
+	private function parse($time, $format = NULL)
 	{
-		if ($time === NULL || $time === '') {
-			// reset to NULL
-			$this->set(NULL);
-		} elseif ($time instanceof self) {
-			$this->set($time->toSeconds());
+		if ($time instanceof self) {
+			return $time->toSeconds();
+		} elseif ($time === NULL || $time === '') {
+			return NULL;
 		} elseif (is_numeric($time)) {
 			// regard it as seconds
-			$this->seconds = (int) $time;
+			return (int) $time;
 		} elseif (is_string($time)) {
 			// regard it as time string
-			$this->setFromFormat($time, $format === NULL ? self::FORMAT_HMS : $format);
+			return $this->parseFormat($time, $format === NULL || $format === '' ? $this->getFormat() : $format);
 		} elseif (is_array($time)) {
 			// [H, m, s]
 			//TODO what if there are negative values?
 			$h = reset($time) * self::HOUR;
-			$m = next($time) * self::MIN;
+			$m = next($time) * self::MINUTE;
 			$s = next($time);
-			$this->set($h + $m + $s);
-		} else {
-			//TODO carbon / datetime
-			throw new RuntimeException('Invalid argument passed.');
+			return $h + $m + $s;
+		} elseif ($time instanceof Carbon || $time instanceof DateTime) {
+			return $this->parse($time->format('H:i:s'));
 		}
-		return $this;
+		throw new RuntimeException('Invalid argument passed.');
 	}
 
 
-	private function set($value)
+	// set() by malo nastavit cas pomocou volania parse()
+	// parse() by malo vracat sekundy
+	// _set moze byt ako interny setter
+
+
+	private function parseFormat($value, $format)
 	{
-		$this->seconds = $value;
-		return $this;
-	}
-
-
-	private function setFromFormat($value, $format)
-	{
-		//TODO implement
-		throw new RuntimeException('Not implemented yet.');
-		return $this;
-	}
-
-
-	public static function fromSeconds($seconds)
-	{
-		$instance = new static();
-		$instance->parseTime((int) $seconds);
-		return $instance;
+		//TODO reimplement using custom format reading...
+		$tz = new DateTimeZone('UTC');
+		return (new DateTime($value, $tz))->getTimestamp() - (new DateTime('00:00:00', $tz))->getTimestamp();
 	}
 
 
@@ -377,7 +570,37 @@ class Time
 	public static function create($time = NULL, $format = NULL)
 	{
 		$instance = new static();
-		return $instance->parseTime($time, $format);
+		return $instance->set($time, $format);
+	}
+
+
+	public static function fromSeconds($seconds)
+	{
+		return static::create((int) $seconds);
+	}
+
+
+	public static function fromMinutes($minutes, $seconds = 0)
+	{
+		return static::create((int) ($minutes * self::MINUTE + $seconds));
+	}
+
+
+	public static function fromHours($hours, $minutes = 0, $seconds = 0)
+	{
+		return static::create((int) ( $hours * self::HOUR + $minutes * self::MINUTE + $seconds));
+	}
+
+
+	public static function fromDays($days, $hours = 0, $minutes = 0, $seconds = 0)
+	{
+		return static::create((int) ($days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds));
+	}
+
+
+	public static function fromWeeks($weeks, $days = 0, $hours = 0, $minutes = 0, $seconds = 0)
+	{
+		return static::create((int) ($weeks * self::WEEK + $days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds));
 	}
 
 }

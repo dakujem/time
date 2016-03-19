@@ -23,7 +23,7 @@ class TimeFactory
 
 	public function create($time)
 	{
-		return $this->createEmpty()->setTime($time)->setFormat($this->getFormat());
+		return $this->createEmpty()->set($time)->setFormat($this->getFormat());
 	}
 
 

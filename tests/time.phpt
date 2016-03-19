@@ -11,6 +11,7 @@ require_once __DIR__ . '/bootstrap.php';
 
 use Dakujem\Time,
 	Dakujem\TimeFactory,
+	Exception,
 	Tester,
 	Tester\Assert;
 
@@ -35,10 +36,10 @@ class TimeTest extends Tester\TestCase
 	{
 		$seconds = 14;
 
-		Assert::same($seconds, (new Time($seconds))->getSeconds());
-		Assert::same($seconds, Time::fromSeconds($seconds)->getSeconds());
+		Assert::same($seconds, (new Time($seconds))->toSeconds());
+		Assert::same($seconds, Time::fromSeconds($seconds)->toSeconds());
 
-		Assert::same($seconds, (new TimeFactory)->create($seconds)->getSeconds());
+		Assert::same($seconds, (new TimeFactory)->create($seconds)->toSeconds());
 	}
 
 
@@ -53,6 +54,7 @@ class TimeTest extends Tester\TestCase
 		Assert::same(0, $timeZero->toSeconds());
 		Assert::same(0, $timeZero->toMinutes());
 		Assert::same(0, $timeZero->toHours());
+		Assert::same(0, $timeZero->getSignum());
 
 
 		$seconds = 6873 * 3600 + 54 * 60 + 18; // 6873 hours 54 minutes 18 seconds
@@ -62,6 +64,7 @@ class TimeTest extends Tester\TestCase
 		Assert::same(54, $time->getMinutes());
 		Assert::same(6873, $time->getHours());
 		Assert::same(FALSE, $time->isNegative());
+		Assert::same(1, $time->getSignum());
 
 		Assert::same($seconds, $time->toSeconds());
 		Assert::same($seconds / 60, $time->toMinutes());
@@ -73,6 +76,7 @@ class TimeTest extends Tester\TestCase
 		Assert::same(54, $timeNegative->getMinutes());
 		Assert::same(6873, $timeNegative->getHours());
 		Assert::same(TRUE, $timeNegative->isNegative());
+		Assert::same(-1, $timeNegative->getSignum());
 
 		Assert::same(-1 * $seconds, $timeNegative->toSeconds());
 		Assert::same(-1 * $seconds / 60, $timeNegative->toMinutes());
@@ -213,6 +217,32 @@ class TimeTest extends Tester\TestCase
 		Assert::same('12:00:01 PM', (string) Time::fromSeconds(12 * 60 * 60 + 1)->setFormat(Time::FORMAT_HMSA));
 		Assert::same('12:00:01 AM', (string) Time::fromSeconds(1)->setFormat(Time::FORMAT_HMSA));
 		//NOTE: there are no tests for invalid day time with 12h format as the behaviour is undefined
+	}
+
+
+	public function testParsing()
+	{
+		Assert::same('12:34:56', (string) Time::create('12:34:56'));
+		Assert::same(45296, Time::create('12:34:56')->toSeconds());
+		Assert::same(300, Time::create('00:05')->toSeconds());
+		Assert::same(300, Time::create('0:5')->toSeconds());
+		Assert::same(5, Time::create('00:00:05')->toSeconds());
+		Assert::same(5, Time::create('0:0:5')->toSeconds());
+		Assert::same(45000, Time::create('12:30 PM')->toSeconds());
+		Assert::same(1800, Time::create('12:30 AM')->toSeconds());
+
+		//TODO for now invalid day times cannot be parsed
+		Assert::error(function() {
+			Assert::same(45296, Time::create('123:34')->toSeconds());
+		}, Exception::CLASS);
+		Assert::error(function() {
+			Assert::same(45296, Time::create('-123:34:12')->toSeconds());
+		}, Exception::CLASS);
+		Assert::error(function() {
+			Assert::same(45296, Time::create('-123:34:12')->toSeconds());
+		}, Exception::CLASS);
+
+		//TODO test carbon / datetime
 	}
 
 }
