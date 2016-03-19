@@ -15,8 +15,6 @@ use RuntimeException;
  * Note: internally, the time is kept in seconds, so the minimum resolution is one second.
  *
  *
- * @todo: toCarbon, toDateTime
- *
  *
  * @todo should the Time object be immutable? should i provide an immutable alternative?
  *

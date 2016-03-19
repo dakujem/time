@@ -1,6 +1,28 @@
 # Time
 
-Foo!
+A simple to use powerful class that makes working with time and temporal data easy.
+
+On the contrary to DateTime or Carbon (nesbot/carbon), Time is simply a container for time measured in seconds,
+it does not refer to any real point-in-time, there are no time zones no nothing.
+
+The aim of the Time library is to help working with temporal data
+like work timer measurements, schedules, time-tables, subscription timers etc.
+
+Your data may be stored in seconds, minutes, hours or in formatted strings, working with Time will still be the same.
+
+```php
+// you can not do this with DateTime nor Carbon:
+(string) Time::create('10:30')->subHours(100); // -89:30:00
+(string) Time::create('-10:30'); // -10:30:00
+
+(string) Time::create(-1); // -00:00:01
+(string) Time::create(-1)->clipToDayTime(); // 23:59:59
+
+(string) Time::create(123)->format(Time::FORMAT_HM); // 00:02
+(string) Time::fromHours(2, 3, 4); // 02:03:04
+
+```
+
 
 TODO which PHP do I actually target?
 
@@ -9,7 +31,7 @@ The easiest way to install Time is to use [Composer](https://getcomposer.org/). 
 ```json
 {
 	"require": {
-		"dakujem/time"
+		"dakujem/time": '*'
 	}
 }
 ```
