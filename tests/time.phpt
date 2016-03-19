@@ -309,6 +309,22 @@ class TimeTest extends Tester\TestCase
 		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(new DateTime('24:02:03'))->toSeconds());
 	}
 
+
+	public function testToCarbon()
+	{
+		$time = Time::fromSeconds(3723)->toCarbon();
+		Assert::type(Carbon::CLASS, $time);
+		Assert::same('01:02:03', $time->format('H:i:s'));
+	}
+
+
+	public function testToDateTime()
+	{
+		$time = Time::fromSeconds(3723)->toDateTime();
+		Assert::type(DateTime::CLASS, $time);
+		Assert::same('01:02:03', $time->format('H:i:s'));
+	}
+
 }
 
 // run the test

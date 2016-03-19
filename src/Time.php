@@ -523,6 +523,35 @@ class Time
 
 
 	/**
+	 * Create and return a DateTime instance using "H:i:s" format.
+	 *
+	 *
+	 * @return DateTime
+	 */
+	public function toDateTime()
+	{
+		return new DateTime($this->copy()->clipToDayTime()->format(self::FORMAT_HMS));
+	}
+
+
+	/**
+	 * Fill a Carbon instance using Carbon::hour(), Carbon::minute() and Carbon::second() methods.
+	 * If a Carbon instance is not provided, a new one will be created.
+	 *
+	 *
+	 * @param Carbon $target an istance to fill
+	 * @return Carbon
+	 */
+	public function toCarbon(Carbon $target = NULL)
+	{
+		if ($target === NULL) {
+			$target = new Carbon();
+		}
+		return $target->hour($this->getHours())->minute($this->getMinutes())->second($this->getSeconds());
+	}
+
+
+	/**
 	 * Get the default output and input time format.
 	 *
 	 *
