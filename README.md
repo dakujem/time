@@ -2,13 +2,13 @@
 
 Foo!
 
+TODO which PHP do I actually target?
 
 ## Installation
 The easiest way to install Time is to use [Composer](https://getcomposer.org/). Just add `"dakujem/time"` to the "require" section in your `composer.json` file, like this:
 ```json
 {
 	"require": {
-		"php": "^5.3 || ^7.0",
 		"dakujem/time"
 	}
 }
