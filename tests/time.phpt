@@ -46,6 +46,7 @@ class TimeTest extends Tester\TestCase
 	public function testGetters()
 	{
 		$timeZero = Time::fromSeconds(0);
+		Assert::same(TRUE, $timeZero->isZero());
 		Assert::same(0, $timeZero->getSeconds());
 		Assert::same(0, $timeZero->getMinutes());
 		Assert::same(0, $timeZero->getHours());
@@ -60,6 +61,7 @@ class TimeTest extends Tester\TestCase
 		$seconds = 6873 * 3600 + 54 * 60 + 18; // 6873 hours 54 minutes 18 seconds
 
 		$time = Time::fromSeconds($seconds);
+		Assert::same(FALSE, $time->isZero());
 		Assert::same(18, $time->getSeconds());
 		Assert::same(54, $time->getMinutes());
 		Assert::same(6873, $time->getHours());
@@ -72,6 +74,7 @@ class TimeTest extends Tester\TestCase
 
 
 		$timeNegative = Time::fromSeconds(-1 * $seconds);
+		Assert::same(FALSE, $timeNegative->isZero());
 		Assert::same(18, $timeNegative->getSeconds());
 		Assert::same(54, $timeNegative->getMinutes());
 		Assert::same(6873, $timeNegative->getHours());
@@ -81,6 +84,14 @@ class TimeTest extends Tester\TestCase
 		Assert::same(-1 * $seconds, $timeNegative->toSeconds());
 		Assert::same(-1 * $seconds / 60, $timeNegative->toMinutes());
 		Assert::same(-1 * $seconds / 60 / 60, $timeNegative->toHours());
+
+
+		$nullTime = (new Time);
+		Assert::same(FALSE, $timeZero->isNULL());
+		Assert::same(FALSE, $timeNegative->isNULL());
+		Assert::same(FALSE, $time->isNULL());
+		Assert::same(TRUE, $nullTime->isNull());
+		Assert::same(FALSE, $nullTime->isZero());
 	}
 
 
@@ -191,6 +202,7 @@ class TimeTest extends Tester\TestCase
 
 		// default format is '?H:i:s'
 		Assert::same(Time::FORMAT_HMS, (new Time)->getFormat());
+		Assert::same('00:00:00', (string) new Time); // uninitialized time
 		Assert::same('00:00:00', (string) Time::fromSeconds(0));
 		Assert::same('00:01:00', (string) Time::fromSeconds(60));
 		Assert::same('00:01:40', (string) Time::fromSeconds(100));

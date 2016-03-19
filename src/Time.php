@@ -53,7 +53,8 @@ class Time
 
 
 	/**
-	 * Add given time value.
+	 * Add given time value:
+	 * $this + $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -66,7 +67,8 @@ class Time
 
 
 	/**
-	 * Substract given time value.
+	 * Substract given time value:
+	 * $this - $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -79,7 +81,8 @@ class Time
 
 
 	/**
-	 * Multiply the time by $x.
+	 * Multiply the time by $x:
+	 * $this * $x
 	 *
 	 *
 	 * @param int|double $x
@@ -92,7 +95,8 @@ class Time
 
 
 	/**
-	 * Divide the time by $x.
+	 * Divide the time by $x:
+	 * $this / $x
 	 *
 	 *
 	 * @param int|double $x
@@ -105,7 +109,8 @@ class Time
 
 
 	/**
-	 * Modulate the time by $x.
+	 * Modulate the time by $x:
+	 * $this % $x
 	 *
 	 *
 	 * @param int $x
@@ -118,7 +123,8 @@ class Time
 
 
 	/**
-	 * Perform a less-than comparison.
+	 * Perform a less-than comparison:
+	 * $this < $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -131,7 +137,8 @@ class Time
 
 
 	/**
-	 * Perform a less-than-or-equal comparison.
+	 * Perform a less-than-or-equal comparison:
+	 * $this <= $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -144,7 +151,8 @@ class Time
 
 
 	/**
-	 * Perform a greater-than comparison.
+	 * Perform a greater-than comparison:
+	 * $this > $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -157,7 +165,8 @@ class Time
 
 
 	/**
-	 * Perform a greater-than-or-equal comparison.
+	 * Perform a greater-than-or-equal comparison:
+	 * $this >= $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -170,7 +179,8 @@ class Time
 
 
 	/**
-	 * Perform a equal-to comparison.
+	 * Perform a equal-to comparison:
+	 * $this == $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -183,7 +193,8 @@ class Time
 
 
 	/**
-	 * Perform a not-equal-to comparison.
+	 * Perform a not-equal-to comparison:
+	 * $this != $time
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time any parsable time format
@@ -197,6 +208,12 @@ class Time
 
 	/**
 	 * Return TRUE when the time is within the interval defined by the given times.
+	 *
+	 * Performs one of these comparisons:
+	 *   $timeMin <= $this <= $timeMax    // this comparison is done for $sharp==FALSE (the default)
+	 *   $timeMin <  $this <  $timeMax    // this comparison is done for $sharp==TRUE
+	 *
+	 * Note: $timeMin and $timeMax are determined from $time1 and $time2.
 	 *
 	 *
 	 * @param int|string|self|DateTime|Carbon $time1 any parsable time format
@@ -237,7 +254,7 @@ class Time
 
 	/**
 	 * Clip the time to a valid day time between 00:00:00 and 23:59:59.
-	 * This will perform a modulo-DAY operation.
+	 * This will perform a modulo-DAY operation: $this % DAY
 	 *
 	 *
 	 * @return self containing time between 00:00:00 and 23:59:59
@@ -353,6 +370,33 @@ class Time
 	public function subWeeks($weeks = 1)
 	{
 		return $this->addWeeks($weeks * -1);
+	}
+
+
+	/**
+	 * Indicate whether the time is equal to zero.
+	 * @see isNULL()
+	 *
+	 *
+	 * @return bool
+	 */
+	public function isZero()
+	{
+		return $this->toSeconds() === 0;
+	}
+
+
+	/**
+	 * Indicate whether the time is NULL,
+	 * which means the time was not set or has been reset to NULL.
+	 * @see isZero()
+	 *
+	 *
+	 * @return bool
+	 */
+	public function isNULL()
+	{
+		return $this->time === NULL;
 	}
 
 
