@@ -9,12 +9,13 @@ namespace Dakujem\Test\Time;
 
 require_once __DIR__ . '/bootstrap.php';
 
-use Carbon\Carbon;
-use Dakujem\Time;
-use Dakujem\TimeFactory;
-use DateTime;
-use Tester;
-use Tester\Assert;
+use Carbon\Carbon,
+	Dakujem\Time,
+	Dakujem\TimeFactory,
+	Dakujem\TimeImmutable,
+	DateTime,
+	Tester,
+	Tester\Assert;
 
 
 class TimeTest extends Tester\TestCase
@@ -359,6 +360,56 @@ class TimeTest extends Tester\TestCase
 		$time = Time::fromSeconds(3723)->toDateTime();
 		Assert::type(DateTime::CLASS, $time);
 		Assert::same('01:02:03', $time->format('H:i:s'));
+	}
+
+
+	/**
+	 * This method tests the behaviour of methods that modify the object.
+	 *
+	 * @note: only setter methods are tested, as getters and comparators are not supposed to modify the object at all.
+	 */
+	public function testMutability()
+	{
+		// calling add(), set() or any other method actually returns the modified $mutable Time instance,
+		// so the result and the original are identical
+		$mutable = new Time(0);
+		$this->mutabilityObjectTest($mutable, TRUE);
+
+		// while using TimeImmutable, however, any modification results in a new instance of TimeImmutable returned
+		$immutable = new TimeImmutable(0);
+		$this->mutabilityObjectTest($immutable, FALSE);
+	}
+
+
+	private function mutabilityObjectTest(Time $timeObject, $expectedResult)
+	{
+		// setting time value
+		Assert::same($expectedResult, $timeObject === $timeObject->set(0));
+
+		// setting format
+		Assert::same($expectedResult, $timeObject === $timeObject->setFormat('foo'));
+
+		// arithmetic operations
+		Assert::same($expectedResult, $timeObject === $timeObject->add(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->sub(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->mult(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->div(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->mod(1));
+
+		// additions
+		Assert::same($expectedResult, $timeObject === $timeObject->addSeconds(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->addMinutes(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->addHours(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->addDays(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->addWeeks(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->subSeconds(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->subMinutes(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->subHours(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->subDays(1));
+		Assert::same($expectedResult, $timeObject === $timeObject->subWeeks(1));
+
+		// clipping
+		Assert::same($expectedResult, $timeObject === $timeObject->clipToDayTime());
 	}
 
 }

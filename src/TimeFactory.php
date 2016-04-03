@@ -13,23 +13,19 @@ namespace Dakujem;
 class TimeFactory
 {
 	private $format = Time::FORMAT_HMS;
+	private $immutable = FALSE;
 
 
-	public function __construct($format = NULL)
+	public function __construct($format = NULL, $immutable = NULL)
 	{
 		$format !== NULL && $this->setFormat($format);
+		$immutable !== NULL && $this->setImmutable($immutable);
 	}
 
 
-	public function create($time)
+	public function create($time = NULL, $format = NULL)
 	{
-		return $this->createEmpty()->set($time)->setFormat($this->getFormat());
-	}
-
-
-	public function createEmpty()
-	{
-		return new Time();
+		return $this->getImmutable() ? new TimeImmutable($time, $format) : new Time($time, $format);
 	}
 
 
@@ -55,6 +51,19 @@ class TimeFactory
 	public function useFormatHoursMinutesSeconds()
 	{
 		return $this->setFormat(Time::FORMAT_HMS);
+	}
+
+
+	public function getImmutable()
+	{
+		return $this->immutable;
+	}
+
+
+	public function setImmutable($immutable)
+	{
+		$this->immutable = !!$immutable;
+		return $this;
 	}
 
 }
