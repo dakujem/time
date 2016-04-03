@@ -11,12 +11,7 @@ use RuntimeException;
 /**
  * Time object.
  *
- *
  * Note: internally, the time is kept in seconds, so the minimum resolution is one second.
- *
- *
- *
- * @todo should the Time object be immutable? should i provide an immutable alternative?
  *
  *
  * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
@@ -37,7 +32,7 @@ class Time
 	/**
 	 * @var int|NULL the time in seconds.
 	 */
-	private $time = NULL;
+	protected $time = NULL;
 
 	const FORMAT_HMS = '?H:i:s'; //           02:34:56     or  -123:45:59
 	const FORMAT_HM = '?H:i'; //              02:34        or  -123:45
@@ -49,7 +44,7 @@ class Time
 	/**
 	 * @var string format, recognized characters "?+HhisGgAa" - see the Time::format() method
 	 */
-	private $format = self::FORMAT_HMS;
+	protected $format = self::FORMAT_HMS;
 
 
 	public function __construct($time = NULL, $format = NULL)
@@ -59,13 +54,17 @@ class Time
 
 
 	/**
-	 * Initializes the object.
-	 * @internal do not call yourself
+	 * Set the time.
+	 * The input is parsed.
+	 *
+	 *
+	 * @param int|string|self|DateTime|Carbon $time
+	 * @param string|NULL $format
+	 * @return self fluent
 	 */
-	private function init($time, $format)
+	public function set($time, $format = NULL)
 	{
-		$time !== NULL && $this->set($time, $format);
-		$format !== NULL && $this->setFormat($format);
+		return $this->_set($this->parse($time, $format));
 	}
 
 
@@ -280,49 +279,6 @@ class Time
 	{
 		$t = $this->_get() % self::DAY;
 		return $this->_set($t < 0 ? $t + self::DAY : $t);
-	}
-
-
-	/**
-	 * Set the time.
-	 * The input is parsed.
-	 *
-	 *
-	 * @param int|string|self|DateTime|Carbon $time
-	 * @param string|NULL $format
-	 * @return self fluent
-	 */
-	public function set($time, $format = NULL)
-	{
-		return $this->_set($this->parse($time, $format));
-	}
-
-
-	/**
-	 * Internal setter.
-	 *
-	 *
-	 * @internal
-	 * @param int|NULL $value
-	 * @return self fluent
-	 */
-	private function _set($value)
-	{
-		$this->time = $value === NULL ? NULL : (int) $value; // TODO use * 1 isntead of (int)
-		return $this;
-	}
-
-
-	/**
-	 * Internal getter.
-	 *
-	 *
-	 * @internal
-	 * @return int|NULL
-	 */
-	private function _get()
-	{
-		return $this->time;
 	}
 
 
@@ -693,7 +649,7 @@ class Time
 	 * @return int|NULL returns NULL when the time passed is NULL or an empty string
 	 * @throws RuntimeException
 	 */
-	private function parse($time, $format = NULL)
+	protected function parse($time, $format = NULL)
 	{
 		if ($time instanceof self) {
 			return $time->_get();
@@ -701,7 +657,7 @@ class Time
 			return NULL;
 		} elseif (is_numeric($time)) {
 			// regard it as seconds
-			return (int) $time;
+			return $time;
 		} elseif (is_string($time)) {
 			// regard it as time string
 			return $this->parseFormat($time, $format === NULL || $format === '' ? $this->getFormat() : $format);
@@ -724,7 +680,7 @@ class Time
 	/**
 	 * @todo sign handling should be improved
 	 */
-	private function parseFormat($value, $format)
+	protected function parseFormat($value, $format)
 	{
 		// 1/ -----------------------------------------------------------------------------------------
 		// read the numbers form the input string
@@ -832,6 +788,38 @@ class Time
 				$h * self::HOUR +
 				$m * self::MINUTE +
 				$s;
+	}
+
+
+	/**
+	 * Initializes the object.
+	 * @internal
+	 */
+	protected function init($time, $format)
+	{
+		$time !== NULL && $this->set($time, $format);
+		$format !== NULL && $this->setFormat($format);
+	}
+
+
+	/**
+	 * Internal setter.
+	 * @internal
+	 */
+	protected function _set($value)
+	{
+		$this->time = $value === NULL ? NULL : (int) $value; // TODO use * 1 instead of (int)
+		return $this;
+	}
+
+
+	/**
+	 * Internal getter.
+	 * @internal
+	 */
+	protected function _get()
+	{
+		return $this->time;
 	}
 
 
