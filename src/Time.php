@@ -387,6 +387,22 @@ class Time
 
 
 	/**
+	 * Returns the value of the internal time member.
+	 *
+	 * Warning:	this method is not intended to be used for retrieving time.
+	 * 			It is provided for forward compatibility and testing purposes only.
+	 * 			In case you need to check for NULL value, use $time->isNull() instead.
+	 *
+	 *
+	 * @return int|NULL
+	 */
+	public function getRaw()
+	{
+		return $this->_get();
+	}
+
+
+	/**
 	 * Indicate whether the time is equal to zero.
 	 * @see isNULL()
 	 *
