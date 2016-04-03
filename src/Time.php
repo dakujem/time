@@ -35,7 +35,7 @@ class Time
 	const WEEK_DAYS = 7;
 
 	/**
-	 * @var int the time in seconds.
+	 * @var int|NULL the time in seconds.
 	 */
 	private $time = NULL;
 
@@ -69,7 +69,7 @@ class Time
 	 */
 	public function add($time)
 	{
-		return $this->_set($this->toSeconds() + $this->parse($time));
+		return $this->_set($this->_get() + $this->parse($time));
 	}
 
 
@@ -83,7 +83,7 @@ class Time
 	 */
 	public function sub($time)
 	{
-		return $this->_set($this->toSeconds() - $this->parse($time));
+		return $this->_set($this->_get() - $this->parse($time));
 	}
 
 
@@ -97,7 +97,7 @@ class Time
 	 */
 	public function mult($x)
 	{
-		return $this->_set($this->toSeconds() * $x);
+		return $this->_set($this->_get() * $x);
 	}
 
 
@@ -111,7 +111,7 @@ class Time
 	 */
 	public function div($x)
 	{
-		return $this->_set($this->toSeconds() / $x);
+		return $this->_set($this->_get() / $x);
 	}
 
 
@@ -125,7 +125,7 @@ class Time
 	 */
 	public function mod($x)
 	{
-		return $this->_set($this->toSeconds() % $x);
+		return $this->_set($this->_get() % $x);
 	}
 
 
@@ -139,7 +139,7 @@ class Time
 	 */
 	public function lt($time)
 	{
-		return $this->toSeconds() < $this->parse($time);
+		return $this->_get() < $this->parse($time);
 	}
 
 
@@ -153,7 +153,7 @@ class Time
 	 */
 	public function lte($time)
 	{
-		return $this->toSeconds() <= $this->parse($time);
+		return $this->_get() <= $this->parse($time);
 	}
 
 
@@ -167,7 +167,7 @@ class Time
 	 */
 	public function gt($time)
 	{
-		return $this->toSeconds() > $this->parse($time);
+		return $this->_get() > $this->parse($time);
 	}
 
 
@@ -181,7 +181,7 @@ class Time
 	 */
 	public function gte($time)
 	{
-		return $this->toSeconds() >= $this->parse($time);
+		return $this->_get() >= $this->parse($time);
 	}
 
 
@@ -195,7 +195,7 @@ class Time
 	 */
 	public function eq($time)
 	{
-		return $this->toSeconds() === $this->parse($time);
+		return $this->_get() === $this->parse($time);
 	}
 
 
@@ -209,7 +209,7 @@ class Time
 	 */
 	public function neq($time)
 	{
-		return $this->toSeconds() !== $this->parse($time);
+		return $this->_get() !== $this->parse($time);
 	}
 
 
@@ -241,8 +241,8 @@ class Time
 		}
 		return
 				$sharp ?
-				$this->toSeconds() > $from && $this->toSeconds() < $to :
-				$this->toSeconds() >= $from && $this->toSeconds() <= $to;
+				$this->_get() > $from && $this->_get() < $to :
+				$this->_get() >= $from && $this->_get() <= $to;
 	}
 
 
@@ -255,7 +255,7 @@ class Time
 	 */
 	public function isValidDayTime()
 	{
-		return $this->toSeconds() >= 0 && $this->toSeconds() < self::DAY;
+		return $this->_get() >= 0 && $this->_get() < self::DAY;
 	}
 
 
@@ -268,7 +268,7 @@ class Time
 	 */
 	public function clipToDayTime()
 	{
-		$t = $this->toSeconds() % self::DAY;
+		$t = $this->_get() % self::DAY;
 		return $this->_set($t < 0 ? $t + self::DAY : $t);
 	}
 
@@ -303,33 +303,46 @@ class Time
 	}
 
 
+	/**
+	 * Internal getter.
+	 *
+	 *
+	 * @internal
+	 * @return int|NULL
+	 */
+	private function _get()
+	{
+		return $this->time;
+	}
+
+
 	public function addSeconds($seconds = 1)
 	{
-		return $this->_set($this->toSeconds() + $seconds);
+		return $this->_set($this->_get() + $seconds);
 	}
 
 
 	public function addMinutes($minutes = 1)
 	{
-		return $this->_set($this->toSeconds() + $minutes * self::MINUTE);
+		return $this->_set($this->_get() + $minutes * self::MINUTE);
 	}
 
 
 	public function addHours($hours = 1)
 	{
-		return $this->_set($this->toSeconds() + $hours * self::HOUR);
+		return $this->_set($this->_get() + $hours * self::HOUR);
 	}
 
 
 	public function addDays($days = 1)
 	{
-		return $this->_set($this->toSeconds() + $days * self::DAY);
+		return $this->_set($this->_get() + $days * self::DAY);
 	}
 
 
 	public function addWeeks($weeks = 1)
 	{
-		return $this->_set($this->toSeconds() + $weeks * self::WEEK);
+		return $this->_set($this->_get() + $weeks * self::WEEK);
 	}
 
 
@@ -372,7 +385,7 @@ class Time
 	 */
 	public function isZero()
 	{
-		return $this->toSeconds() === 0;
+		return $this->_get() === 0;
 	}
 
 
@@ -386,7 +399,7 @@ class Time
 	 */
 	public function isNULL()
 	{
-		return $this->time === NULL;
+		return $this->_get() === NULL;
 	}
 
 
@@ -398,7 +411,7 @@ class Time
 	 */
 	public function isNegative()
 	{
-		return $this->toSeconds() < 0;
+		return $this->_get() < 0;
 	}
 
 
@@ -410,7 +423,7 @@ class Time
 	 */
 	public function getSignum()
 	{
-		$s = $this->toSeconds();
+		$s = $this->_get();
 		return $s < 0 ? -1 : ($s === 0 ? 0 : 1);
 	}
 
@@ -426,7 +439,7 @@ class Time
 	 */
 	public function getSeconds()
 	{
-		return (int) abs($this->toSeconds() % self::MINUTE);
+		return (int) abs($this->_get() % self::MINUTE);
 	}
 
 
@@ -441,7 +454,7 @@ class Time
 	 */
 	public function getMinutes()
 	{
-		return (int) abs(((int) ($this->toSeconds() / self::MINUTE)) % self::MINUTE);
+		return (int) abs(((int) ($this->_get() / self::MINUTE)) % self::MINUTE);
 	}
 
 
@@ -456,7 +469,7 @@ class Time
 	 */
 	public function getHours()
 	{
-		return (int) abs((int) ($this->toSeconds() / self::HOUR));
+		return (int) abs((int) ($this->_get() / self::HOUR));
 	}
 
 
@@ -468,7 +481,7 @@ class Time
 	 */
 	public function toSeconds()
 	{
-		return $this->time;
+		return $this->_get();
 	}
 
 
@@ -480,7 +493,7 @@ class Time
 	 */
 	public function toMinutes()
 	{
-		return $this->toSeconds() / self::MINUTE;
+		return $this->_get() / self::MINUTE;
 	}
 
 
@@ -492,7 +505,7 @@ class Time
 	 */
 	public function toHours()
 	{
-		return $this->toSeconds() / self::HOUR;
+		return $this->_get() / self::HOUR;
 	}
 
 
@@ -504,7 +517,7 @@ class Time
 	 */
 	public function toDays()
 	{
-		return $this->toSeconds() / self::DAY;
+		return $this->_get() / self::DAY;
 	}
 
 
@@ -516,7 +529,7 @@ class Time
 	 */
 	public function toWeeks()
 	{
-		return $this->toSeconds() / self::WEEK;
+		return $this->_get() / self::WEEK;
 	}
 
 
@@ -656,7 +669,7 @@ class Time
 	private function parse($time, $format = NULL)
 	{
 		if ($time instanceof self) {
-			return $time->toSeconds();
+			return $time->_get();
 		} elseif ($time === NULL || $time === '') {
 			return NULL;
 		} elseif (is_numeric($time)) {
