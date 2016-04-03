@@ -58,9 +58,9 @@ class Time
 	 * The input is parsed.
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time
+	 * @param int|string|static|DateTime|Carbon $time
 	 * @param string|NULL $format
-	 * @return self fluent
+	 * @return static fluent
 	 */
 	public function set($time, $format = NULL)
 	{
@@ -73,8 +73,8 @@ class Time
 	 * $this + $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
-	 * @return self
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @return static
 	 */
 	public function add($time)
 	{
@@ -87,8 +87,8 @@ class Time
 	 * $this - $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
-	 * @return self
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @return static
 	 */
 	public function sub($time)
 	{
@@ -102,7 +102,7 @@ class Time
 	 *
 	 *
 	 * @param int|double $x
-	 * @return self
+	 * @return static
 	 */
 	public function mult($x)
 	{
@@ -116,7 +116,7 @@ class Time
 	 *
 	 *
 	 * @param int|double $x
-	 * @return self
+	 * @return static
 	 */
 	public function div($x)
 	{
@@ -130,7 +130,7 @@ class Time
 	 *
 	 *
 	 * @param int $x
-	 * @return self
+	 * @return static
 	 */
 	public function mod($x)
 	{
@@ -143,7 +143,7 @@ class Time
 	 * $this < $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
 	 * @return bool
 	 */
 	public function lt($time)
@@ -157,7 +157,7 @@ class Time
 	 * $this <= $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
 	 * @return bool
 	 */
 	public function lte($time)
@@ -171,7 +171,7 @@ class Time
 	 * $this > $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
 	 * @return bool
 	 */
 	public function gt($time)
@@ -185,7 +185,7 @@ class Time
 	 * $this >= $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
 	 * @return bool
 	 */
 	public function gte($time)
@@ -199,7 +199,7 @@ class Time
 	 * $this == $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
 	 * @return bool
 	 */
 	public function eq($time)
@@ -213,7 +213,7 @@ class Time
 	 * $this != $time
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time any parsable time format
 	 * @return bool
 	 */
 	public function neq($time)
@@ -232,8 +232,8 @@ class Time
 	 * Note: $timeMin and $timeMax are determined from $time1 and $time2.
 	 *
 	 *
-	 * @param int|string|self|DateTime|Carbon $time1 any parsable time format
-	 * @param int|string|self|DateTime|Carbon $time2 any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time1 any parsable time format
+	 * @param int|string|static|DateTime|Carbon $time2 any parsable time format
 	 * @param bool $sharp [=FALSE] exclude the extremes of the interval?
 	 * @return bool
 	 */
@@ -273,7 +273,7 @@ class Time
 	 * This will perform a modulo-DAY operation: $this % DAY
 	 *
 	 *
-	 * @return self containing time between 00:00:00 and 23:59:59
+	 * @return static containing time between 00:00:00 and 23:59:59
 	 */
 	public function clipToDayTime()
 	{
@@ -562,7 +562,7 @@ class Time
 	 *
 	 *
 	 * @param string $format
-	 * @return self fluent
+	 * @return static fluent
 	 */
 	public function setFormat($format)
 	{
@@ -575,7 +575,7 @@ class Time
 	 * Set the default output and input time format to hours:minutes (HH:MM)
 	 *
 	 *
-	 * @return self fluent
+	 * @return static fluent
 	 */
 	public function useFormatHoursMinutes()
 	{
@@ -587,7 +587,7 @@ class Time
 	 * Set the default output and input time format to hours:minutes:seconds (HH:MM:SS).
 	 *
 	 *
-	 * @return self fluent
+	 * @return static fluent
 	 */
 	public function useFormatHoursMinutesSeconds()
 	{
@@ -827,7 +827,7 @@ class Time
 	 * Create and return a copy of self.
 	 *
 	 *
-	 * @return self a copy of the original Time object, for fluent calls
+	 * @return static a copy of the original Time object, for fluent calls
 	 */
 	public function copy()
 	{
