@@ -9,7 +9,7 @@ use RuntimeException;
 
 
 /**
- * Time.
+ * Time object.
  *
  *
  * Note: internally, the time is kept in seconds, so the minimum resolution is one second.
@@ -53,6 +53,16 @@ class Time
 
 
 	public function __construct($time = NULL, $format = NULL)
+	{
+		$this->init($time, $format);
+	}
+
+
+	/**
+	 * Initializes the object.
+	 * @internal do not call yourself
+	 */
+	private function init($time, $format)
 	{
 		$time !== NULL && $this->set($time, $format);
 		$format !== NULL && $this->setFormat($format);
@@ -298,7 +308,7 @@ class Time
 	 */
 	private function _set($value)
 	{
-		$this->time = $value === NULL ? NULL : (int) $value;
+		$this->time = $value === NULL ? NULL : (int) $value; // TODO use * 1 isntead of (int)
 		return $this;
 	}
 
@@ -474,19 +484,19 @@ class Time
 
 
 	/**
-	 * Return the time in seconds.
+	 * Return the stored time in seconds.
 	 *
 	 *
-	 * @return int
+	 * @return int|double
 	 */
 	public function toSeconds()
 	{
-		return $this->_get();
+		return $this->_get() * 1;
 	}
 
 
 	/**
-	 * Return the time in minutes.
+	 * Return the stored time in minutes.
 	 *
 	 *
 	 * @return int|double
@@ -498,7 +508,7 @@ class Time
 
 
 	/**
-	 * Return the time in hours.
+	 * Return the stored time in hours.
 	 *
 	 *
 	 * @return int|double
@@ -510,7 +520,7 @@ class Time
 
 
 	/**
-	 * Return the time in days.
+	 * Return the stored time in days.
 	 *
 	 *
 	 * @return int|double
@@ -522,7 +532,7 @@ class Time
 
 
 	/**
-	 * Return the time in weeks.
+	 * Return the stored time in weeks.
 	 *
 	 *
 	 * @return int|double
@@ -535,6 +545,7 @@ class Time
 
 	/**
 	 * Create and return a DateTime instance using "H:i:s" format.
+	 * Note: this will clip the stored time to a valid day time value using clipToDayTime() method.
 	 *
 	 *
 	 * @return DateTime
@@ -821,7 +832,7 @@ class Time
 
 
 	/**
-	 * Universal factory.
+	 * Universal static factory.
 	 *
 	 *
 	 * @param mixed $time
@@ -830,8 +841,7 @@ class Time
 	 */
 	public static function create($time = NULL, $format = NULL)
 	{
-		$instance = new static();
-		return $instance->set($time, $format);
+		return new static($time, $format);
 	}
 
 

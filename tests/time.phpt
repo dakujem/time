@@ -307,8 +307,8 @@ class TimeTest extends Tester\TestCase
 		Assert::same(45000, Time::create('PM 12:30', Time::FORMAT_HMSA)->toSeconds());
 		Assert::same(1800, Time::create('AM 12:30', Time::FORMAT_HMSA)->toSeconds());
 		Assert::same(41404, Time::create('AM 11:30:04', Time::FORMAT_HMSA)->toSeconds());
-		Assert::same(NULL, Time::create('13:30 AM', Time::FORMAT_HMSA)->toSeconds()); // not a valid 12-h time
-		Assert::same(NULL, Time::create('-1:30 AM', Time::FORMAT_HMSA)->toSeconds()); // not a valid 12-h time
+		Assert::same(TRUE, Time::create('13:30 AM', Time::FORMAT_HMSA)->isNULL()); // not a valid 12-h time
+		Assert::same(TRUE, Time::create('-1:30 AM', Time::FORMAT_HMSA)->isNULL()); // not a valid 12-h time
 		/**/
 		// not valid day times
 		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE, Time::create('123:34')->toSeconds());
