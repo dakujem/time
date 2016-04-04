@@ -83,37 +83,36 @@ class TimeTest extends TestCase
 
 	public function testInternals()
 	{
+		// test the raw getter and basic constructor
+		// Note: the raw getter is not intended for time getting outside the test environment
 		Assert::same(NULL, (new Time)->getRaw());
 		Assert::same(1, (new Time(1))->getRaw());
 		Assert::same(-1, (new Time(-1))->getRaw());
-		Assert::same(3550 * Time::WEEK, (new Time(3550 * Time::WEEK))->getRaw()); // this is about the maximum for int
-		Assert::same(-3550 * Time::WEEK, (new Time(-3550 * Time::WEEK))->getRaw()); // this is about the minimum for int
-	}
 
+		// min / max for int - these values are approximate
+		Assert::same(3550 * Time::WEEK, (new Time(3550 * Time::WEEK))->getRaw());
+		Assert::same(-3550 * Time::WEEK, (new Time(-3550 * Time::WEEK))->getRaw());
 
-	public function testFactories()
-	{
-		$seconds = 14;
-		$format = Time::FORMAT_HMS;
+		// test the internal workings of toSeconds - needed for further tests
+		Assert::same((new Time)->toSeconds(), (new Time)->getRaw() * Time::SECOND);
+		Assert::same((new Time(1))->toSeconds(), (new Time(1))->getRaw() * Time::SECOND);
+		Assert::same((new Time(100))->toSeconds(), (new Time(100))->getRaw() * Time::SECOND);
+		Assert::same((new Time(-1))->toSeconds(), (new Time(-1))->getRaw() * Time::SECOND);
+		Assert::same((new Time(-100))->toSeconds(), (new Time(-100))->getRaw() * Time::SECOND);
+		Assert::same((new Time(1.4))->toSeconds(), (new Time(1.4))->getRaw() * Time::SECOND);
+		Assert::same((new Time(-1.4))->toSeconds(), (new Time(-1.4))->getRaw() * Time::SECOND);
 
-		// constructor
-		Assert::same($seconds, (new Time($seconds))->toSeconds());
-		Assert::same($seconds, (new Time($seconds, $format))->toSeconds());
-		Assert::same($seconds, (new Time('00:00:' . $seconds, $format))->toSeconds());
-
-		// universal factory
-		Assert::same($seconds, Time::create($seconds)->toSeconds());
-
-		// from *
-		Assert::same($seconds, Time::fromSeconds($seconds)->toSeconds());
-
-		// copy
-		Assert::same($seconds, Time::create($seconds)->copy()->toSeconds());
-
-		// time factory
-		Assert::same($seconds, (new TimeFactory)->create($seconds)->toSeconds());
-
-		//TODO ->set()
+		// test the basic static factory - fromSeconds - needed for further test
+		Assert::same(0, Time::fromSeconds(NULL)->getRaw());
+		Assert::same(0, Time::fromSeconds('')->getRaw());
+		Assert::same(0, Time::fromSeconds('foo')->getRaw());
+		Assert::same(0, Time::fromSeconds('0')->getRaw());
+		Assert::same(4, Time::fromSeconds('4')->getRaw());
+		Assert::same(0, Time::fromSeconds(FALSE)->getRaw());
+		Assert::same(1, Time::fromSeconds(TRUE)->getRaw());
+		Assert::same(0, Time::fromSeconds(0)->getRaw());
+		Assert::same(1, Time::fromSeconds(1)->getRaw());
+		Assert::same(-12, Time::fromSeconds(-12)->getRaw());
 	}
 
 
@@ -396,6 +395,32 @@ class TimeTest extends TestCase
 		// test DateTime
 		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(new DateTime('1:02:03'))->toSeconds());
 		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(new DateTime('24:02:03'))->toSeconds());
+	}
+
+
+	public function testFactories()
+	{
+		$seconds = 14;
+		$format = Time::FORMAT_HMS;
+
+		// constructor
+		Assert::same($seconds, (new Time($seconds))->toSeconds());
+		Assert::same($seconds, (new Time($seconds, $format))->toSeconds());
+		Assert::same($seconds, (new Time('00:00:' . $seconds, $format))->toSeconds());
+
+		// universal factory
+		Assert::same($seconds, Time::create($seconds)->toSeconds());
+
+		// from *
+		Assert::same($seconds, Time::fromSeconds($seconds)->toSeconds());
+
+		// copy
+		Assert::same($seconds, Time::create($seconds)->copy()->toSeconds());
+
+		// time factory
+		Assert::same($seconds, (new TimeFactory)->create($seconds)->toSeconds());
+
+		//TODO ->set()
 	}
 
 

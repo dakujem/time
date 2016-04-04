@@ -840,7 +840,7 @@ class Time
 	 * Universal static factory.
 	 *
 	 *
-	 * @param mixed $time
+	 * @param mixed $time any parsable time or NULL
 	 * @param string|NULL $format optional, use when passing a string as $time
 	 * @return static the Time object
 	 */
