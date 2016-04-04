@@ -53,6 +53,7 @@ class TimeTest extends TestCase
 	public function testConstants()
 	{
 		// time constants
+		Assert::same(1, Time::SECOND);
 		Assert::same(60, Time::MINUTE);
 		Assert::same(60, Time::HOUR_MINUTES);
 		Assert::same(24, Time::DAY_HOURS);
@@ -82,7 +83,11 @@ class TimeTest extends TestCase
 
 	public function testInternals()
 	{
-		//TODO getRaw()
+		Assert::same(NULL, (new Time)->getRaw());
+		Assert::same(1, (new Time(1))->getRaw());
+		Assert::same(-1, (new Time(-1))->getRaw());
+		Assert::same(3550 * Time::WEEK, (new Time(3550 * Time::WEEK))->getRaw()); // this is about the maximum for int
+		Assert::same(-3550 * Time::WEEK, (new Time(-3550 * Time::WEEK))->getRaw()); // this is about the minimum for int
 	}
 
 
@@ -114,6 +119,21 @@ class TimeTest extends TestCase
 
 	public function testGetters()
 	{
+		$uninitialized = new Time;
+		Assert::same(FALSE, $uninitialized->isZero());
+		Assert::same(0, $uninitialized->getSeconds());
+		Assert::same(0, $uninitialized->getMinutes());
+		Assert::same(0, $uninitialized->getHours());
+		Assert::same(FALSE, $uninitialized->isNegative());
+
+		Assert::same(0, $uninitialized->toSeconds());
+		Assert::same(0, $uninitialized->toMinutes());
+		Assert::same(0, $uninitialized->toHours());
+		Assert::same(0, $uninitialized->getSignum());
+		Assert::same(0, $uninitialized->toDays());
+		Assert::same(0, $uninitialized->toWeeks());
+
+
 		$timeZero = Time::fromSeconds(0);
 		Assert::same(TRUE, $timeZero->isZero());
 		Assert::same(0, $timeZero->getSeconds());
@@ -125,6 +145,8 @@ class TimeTest extends TestCase
 		Assert::same(0, $timeZero->toMinutes());
 		Assert::same(0, $timeZero->toHours());
 		Assert::same(0, $timeZero->getSignum());
+		Assert::same(0, $timeZero->toDays());
+		Assert::same(0, $timeZero->toWeeks());
 
 
 		$seconds = 6873 * Time::HOUR + 54 * Time::MINUTE + 18; // 6873 hours 54 minutes 18 seconds
@@ -140,6 +162,8 @@ class TimeTest extends TestCase
 		Assert::same($seconds, $time->toSeconds());
 		Assert::same($seconds / Time::MINUTE, $time->toMinutes());
 		Assert::same($seconds / Time::HOUR, $time->toHours());
+		Assert::same($seconds / Time::DAY, $time->toDays());
+		Assert::same($seconds / Time::WEEK, $time->toWeeks());
 
 
 		$timeNegative = Time::fromSeconds(-1 * $seconds);
@@ -153,14 +177,14 @@ class TimeTest extends TestCase
 		Assert::same(-1 * $seconds, $timeNegative->toSeconds());
 		Assert::same(-1 * $seconds / Time::MINUTE, $timeNegative->toMinutes());
 		Assert::same(-1 * $seconds / Time::HOUR, $timeNegative->toHours());
+		Assert::same(-1 * $seconds / Time::DAY, $timeNegative->toDays());
+		Assert::same(-1 * $seconds / Time::WEEK, $timeNegative->toWeeks());
 
 
-		$nullTime = (new Time);
+		Assert::same(TRUE, $uninitialized->isNull());
 		Assert::same(FALSE, $timeZero->isNULL());
 		Assert::same(FALSE, $timeNegative->isNULL());
 		Assert::same(FALSE, $time->isNULL());
-		Assert::same(TRUE, $nullTime->isNull());
-		Assert::same(FALSE, $nullTime->isZero());
 	}
 
 

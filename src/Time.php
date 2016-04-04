@@ -406,7 +406,7 @@ class Time
 	 */
 	public function getSignum()
 	{
-		$s = $this->_get();
+		$s = $this->_get() * self::SECOND;
 		return $s < 0 ? -1 : ($s === 0 ? 0 : 1);
 	}
 
