@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is a part of dakujem/time package.
+ * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
+ */
+
 
 namespace Dakujem\Time\Test;
 

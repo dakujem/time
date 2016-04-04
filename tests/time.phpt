@@ -1,7 +1,8 @@
 <?php
 
 /**
- * @author Andrej Rypak <xrypak@gmail.com>
+ * This file is a part of dakujem/time package.
+ * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
  */
 
 
@@ -14,11 +15,22 @@ use Carbon\Carbon,
 	Dakujem\TimeFactory,
 	Dakujem\TimeImmutable,
 	DateTime,
-	Tester,
-	Tester\Assert;
+	Tester\Assert,
+	Tester\TestCase;
 
 
-class TimeTest extends Tester\TestCase
+/**
+ * Unit test for Time and TimeImmutable classes.
+ *
+ *
+ * The test methods (starting with "test") will all be run in the order of definition.
+ * Before each method call, setUp() is called, and tearDown() after the method run.
+ * @see Nette Tester ("nette/tester") for more information
+ *
+ *
+ * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
+ */
+class TimeTest extends TestCase
 {
 
 
@@ -32,6 +44,10 @@ class TimeTest extends Tester\TestCase
 	{
 		parent::tearDown();
 	}
+
+
+	//--------------------------------------------------------------------------
+	//----------------------- Test methods -------------------------------------
 
 
 	public function testConstants()
@@ -61,6 +77,12 @@ class TimeTest extends Tester\TestCase
 		Assert::same('+H:i', Time::FORMAT_HM_SIGNED);
 		Assert::same('h:i:s A', Time::FORMAT_HMSA);
 		Assert::same('h:i A', Time::FORMAT_HMA);
+	}
+
+
+	public function testInternals()
+	{
+		//TODO getRaw()
 	}
 
 
@@ -105,7 +127,7 @@ class TimeTest extends Tester\TestCase
 		Assert::same(0, $timeZero->getSignum());
 
 
-		$seconds = 6873 * 3600 + 54 * 60 + 18; // 6873 hours 54 minutes 18 seconds
+		$seconds = 6873 * Time::HOUR + 54 * Time::MINUTE + 18; // 6873 hours 54 minutes 18 seconds
 
 		$time = Time::fromSeconds($seconds);
 		Assert::same(FALSE, $time->isZero());
@@ -116,8 +138,8 @@ class TimeTest extends Tester\TestCase
 		Assert::same(1, $time->getSignum());
 
 		Assert::same($seconds, $time->toSeconds());
-		Assert::same($seconds / 60, $time->toMinutes());
-		Assert::same($seconds / 60 / 60, $time->toHours());
+		Assert::same($seconds / Time::MINUTE, $time->toMinutes());
+		Assert::same($seconds / Time::HOUR, $time->toHours());
 
 
 		$timeNegative = Time::fromSeconds(-1 * $seconds);
@@ -129,8 +151,8 @@ class TimeTest extends Tester\TestCase
 		Assert::same(-1, $timeNegative->getSignum());
 
 		Assert::same(-1 * $seconds, $timeNegative->toSeconds());
-		Assert::same(-1 * $seconds / 60, $timeNegative->toMinutes());
-		Assert::same(-1 * $seconds / 60 / 60, $timeNegative->toHours());
+		Assert::same(-1 * $seconds / Time::MINUTE, $timeNegative->toMinutes());
+		Assert::same(-1 * $seconds / Time::HOUR, $timeNegative->toHours());
 
 
 		$nullTime = (new Time);
@@ -142,25 +164,10 @@ class TimeTest extends Tester\TestCase
 	}
 
 
-	public function testTimeFunctions()
-	{
-		// is valid day time
-		Assert::same(TRUE, Time::fromSeconds(0)->isValidDayTime());
-		Assert::same(TRUE, Time::fromSeconds(1)->isValidDayTime());
-		Assert::same(FALSE, Time::fromSeconds(Time::DAY)->isValidDayTime());
-		Assert::same(TRUE, Time::fromSeconds(Time::DAY - 1)->isValidDayTime());
-		Assert::same(FALSE, Time::fromSeconds(-1)->isValidDayTime());
-
-		// clip to day time
-		Assert::same(TRUE, Time::fromSeconds(-1)->clipToDayTime()->isValidDayTime());
-		Assert::same(TRUE, Time::fromSeconds(Time::DAY)->clipToDayTime()->isValidDayTime());
-		Assert::same(Time::DAY - 1, Time::fromSeconds(-1)->clipToDayTime()->toSeconds());
-		Assert::same(0, Time::fromSeconds(Time::DAY)->clipToDayTime()->toSeconds());
-	}
-
-
 	public function testArithmeticFunctions()
 	{
+		//NOTE: all the modifications are accumulated into the Time object.
+
 		$t = Time::fromSeconds(6);
 		// add
 		Assert::same(12, $t->add($t)->toSeconds()); // 6+6
@@ -183,20 +190,28 @@ class TimeTest extends Tester\TestCase
 	{
 		$t = Time::create();
 
+		// add
 		Assert::same(2, $t->copy()->addSeconds(2)->toSeconds());
 		Assert::same(2, $t->copy()->addMinutes(2)->toMinutes());
 		Assert::same(2, $t->copy()->addHours(2)->toHours());
 		Assert::same(2, $t->copy()->addDays(2)->toDays());
 		Assert::same(2, $t->copy()->addWeeks(2)->toWeeks());
 
+		// sub
 		Assert::same(-2, $t->copy()->subSeconds(2)->toSeconds());
 		Assert::same(-2, $t->copy()->subMinutes(2)->toMinutes());
 		Assert::same(-2, $t->copy()->subHours(2)->toHours());
 		Assert::same(-2, $t->copy()->subDays(2)->toDays());
 		Assert::same(-2, $t->copy()->subWeeks(2)->toWeeks());
 
+		// negatives
 		Assert::same(-2, $t->copy()->addSeconds(-2)->toSeconds());
 		Assert::same(2, $t->copy()->subSeconds(-2)->toSeconds());
+
+		// clipping
+		Assert::same(Time::DAY - 1, Time::fromSeconds(-1)->clipToDayTime()->toSeconds());
+		Assert::same(0, Time::fromSeconds(Time::DAY)->clipToDayTime()->toSeconds());
+		Assert::same(1, Time::fromSeconds(1)->clipToDayTime()->toSeconds());
 	}
 
 
@@ -255,6 +270,19 @@ class TimeTest extends Tester\TestCase
 		Assert::same(FALSE, $t3->between($t1, $t2));
 		Assert::same(TRUE, $t1->between($t1, $t1)); // using <= and >= operators
 		Assert::same(FALSE, $t1->between($t1, $t1, TRUE)); // using < and > operators
+	}
+
+
+	public function testTimeFunctions()
+	{
+		// is valid day time
+		Assert::same(TRUE, Time::fromSeconds(0)->isValidDayTime());
+		Assert::same(TRUE, Time::fromSeconds(1)->isValidDayTime());
+		Assert::same(FALSE, Time::fromSeconds(Time::DAY)->isValidDayTime());
+		Assert::same(TRUE, Time::fromSeconds(Time::DAY - 1)->isValidDayTime());
+		Assert::same(FALSE, Time::fromSeconds(-1)->isValidDayTime());
+		Assert::same(TRUE, Time::fromSeconds(-1)->clipToDayTime()->isValidDayTime());
+		Assert::same(TRUE, Time::fromSeconds(Time::DAY)->clipToDayTime()->isValidDayTime());
 	}
 
 
@@ -379,6 +407,10 @@ class TimeTest extends Tester\TestCase
 		$immutable = new TimeImmutable(0);
 		$this->mutabilityObjectTest($immutable, FALSE);
 	}
+
+
+	//--------------------------------------------------------------------------
+	//----------------------- Aux methods --------------------------------------
 
 
 	private function mutabilityObjectTest(Time $timeObject, $expectedResult)
