@@ -18,6 +18,7 @@ use RuntimeException;
  */
 class Time
 {
+	const SECOND = 1;
 	const MINUTE = 60;
 	const HOUR = 3600; //   60 * 60
 	const DAY = 86400; //   60 * 60 * 24
@@ -284,7 +285,7 @@ class Time
 
 	public function addSeconds($seconds = 1)
 	{
-		return $this->_set($this->_get() + $seconds);
+		return $this->_set($this->_get() + $seconds * self::SECOND);
 	}
 
 
@@ -463,7 +464,7 @@ class Time
 	 */
 	public function toSeconds()
 	{
-		return $this->_get() * 1;
+		return $this->_get() * self::SECOND;
 	}
 
 
@@ -787,7 +788,7 @@ class Time
 		return
 				$h * self::HOUR +
 				$m * self::MINUTE +
-				$s;
+				$s * self::SECOND;
 	}
 
 
@@ -808,7 +809,7 @@ class Time
 	 */
 	protected function _set($value)
 	{
-		$this->time = $value === NULL ? NULL : (int) $value; // TODO use * 1 instead of (int)
+		$this->time = $value === NULL ? NULL : (int) $value; // TODO use *self::SECOND instead of (int)
 		return $this;
 	}
 
@@ -851,31 +852,31 @@ class Time
 
 	public static function fromSeconds($seconds)
 	{
-		return static::create((int) $seconds);
+		return static::create($seconds * self::SECOND);
 	}
 
 
 	public static function fromMinutes($minutes, $seconds = 0)
 	{
-		return static::create((int) ($minutes * self::MINUTE + $seconds));
+		return static::create($minutes * self::MINUTE + $seconds * self::SECOND);
 	}
 
 
 	public static function fromHours($hours, $minutes = 0, $seconds = 0)
 	{
-		return static::create((int) ( $hours * self::HOUR + $minutes * self::MINUTE + $seconds));
+		return static::create($hours * self::HOUR + $minutes * self::MINUTE + $seconds * self::SECOND);
 	}
 
 
 	public static function fromDays($days, $hours = 0, $minutes = 0, $seconds = 0)
 	{
-		return static::create((int) ($days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds));
+		return static::create($days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds * self::SECOND);
 	}
 
 
 	public static function fromWeeks($weeks, $days = 0, $hours = 0, $minutes = 0, $seconds = 0)
 	{
-		return static::create((int) ($weeks * self::WEEK + $days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds));
+		return static::create($weeks * self::WEEK + $days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds * self::SECOND);
 	}
 
 }
