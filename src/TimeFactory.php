@@ -5,7 +5,12 @@ namespace Dakujem;
 
 
 /**
- * TimeFactory.
+ * TimeFactory - a factory service.
+ * Use it to create Time or TimeImmutable objects with a certain format setting
+ * and/or when you do not want to call static factories of the time objects in your code.
+ *
+ * TimeFactory::$immutable flag determins, which of the two time objects will be created - Time or TimeImmutable.
+ * TimeFactory::$format will be set to all created classes.
  *
  * 
  * @author Andrej Rypak <xrypak@gmail.com>
