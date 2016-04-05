@@ -852,31 +852,43 @@ class Time
 
 	public static function fromSeconds($seconds)
 	{
-		return static::create($seconds * self::SECOND);
+		return static::create(self::calculateSeconds(0, 0, 0, 0, $seconds));
 	}
 
 
 	public static function fromMinutes($minutes, $seconds = 0)
 	{
-		return static::create($minutes * self::MINUTE + $seconds * self::SECOND);
+		return static::create(self::calculateSeconds(0, 0, 0, $minutes, $seconds));
 	}
 
 
 	public static function fromHours($hours, $minutes = 0, $seconds = 0)
 	{
-		return static::create($hours * self::HOUR + $minutes * self::MINUTE + $seconds * self::SECOND);
+		return static::create(self::calculateSeconds(0, 0, $hours, $minutes, $seconds));
 	}
 
 
 	public static function fromDays($days, $hours = 0, $minutes = 0, $seconds = 0)
 	{
-		return static::create($days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds * self::SECOND);
+		return static::create(self::calculateSeconds(0, $days, $hours, $minutes, $seconds));
 	}
 
 
 	public static function fromWeeks($weeks, $days = 0, $hours = 0, $minutes = 0, $seconds = 0)
 	{
-		return static::create($weeks * self::WEEK + $days * self::DAY + $hours * self::HOUR + $minutes * self::MINUTE + $seconds * self::SECOND);
+		return static::create(self::calculateSeconds($weeks, $days, $hours, $minutes, $seconds));
+	}
+
+
+	protected static function calculateSeconds($weeks, $days, $hours, $minutes, $seconds)
+	{
+		return
+				$weeks * self::WEEK +
+				$days * self::DAY +
+				$hours * self::HOUR +
+				$minutes * self::MINUTE +
+				$seconds * self::SECOND
+		;
 	}
 
 }

@@ -113,6 +113,23 @@ class TimeTest extends TestCase
 		Assert::same(0, Time::fromSeconds(0)->getRaw());
 		Assert::same(1, Time::fromSeconds(1)->getRaw());
 		Assert::same(-12, Time::fromSeconds(-12)->getRaw());
+
+		// test the copy method
+		$t = new Time;
+		Assert::equal($t, $t->copy());
+		Assert::notSame($t, $t->copy());
+		$t1 = new Time(1);
+		Assert::equal($t1, $t1->copy());
+		Assert::notSame($t1, $t1->copy());
+		$t2 = new Time(-1);
+		Assert::equal($t2, $t2->copy());
+		Assert::notSame($t2, $t2->copy());
+		$t3 = new Time(1, 'foo');
+		Assert::equal($t3, $t3->copy());
+		Assert::notSame($t3, $t3->copy());
+		$t4 = new Time(NULL, 'foo');
+		Assert::equal($t4, $t4->copy());
+		Assert::notSame($t4, $t4->copy());
 	}
 
 
@@ -400,27 +417,70 @@ class TimeTest extends TestCase
 
 	public function testFactories()
 	{
-		$seconds = 14;
-		$format = Time::FORMAT_HMS;
+		// Note: the raw getter is not intended for time getting outside the test environment
+
+		$testValues = [
+			[
+				'input' => 14,
+				'format' => NULL,
+				'expected' => 14,
+			],
+			[
+				'input' => '12:30:45',
+				'format' => Time::FORMAT_HMS,
+				'expected' => 12 * Time::HOUR + 30 * Time::MINUTE + 45 * Time::SECOND,
+			],
+			[
+				'input' => '-00:00:01',
+				'format' => Time::FORMAT_HMS,
+				'expected' => -1 * Time::SECOND,
+			],
+			[
+				'input' => NULL,
+				'format' => Time::FORMAT_HMS,
+				'expected' => NULL,
+			],
+		];
 
 		// constructor
-		Assert::same($seconds, (new Time($seconds))->toSeconds());
-		Assert::same($seconds, (new Time($seconds, $format))->toSeconds());
-		Assert::same($seconds, (new Time('00:00:' . $seconds, $format))->toSeconds());
+		foreach ($testValues as $v) {
+			Assert::same($v['expected'], (new Time($v['input'], $v['format']))->getRaw());
+		}
 
 		// universal factory
-		Assert::same($seconds, Time::create($seconds)->toSeconds());
+		foreach ($testValues as $v) {
+			Assert::same($v['expected'], Time::create($v['input'], $v['format'])->getRaw());
+		}
 
-		// from *
-		Assert::same($seconds, Time::fromSeconds($seconds)->toSeconds());
-
-		// copy
-		Assert::same($seconds, Time::create($seconds)->copy()->toSeconds());
+		// ->set()
+		foreach ($testValues as $v) {
+			$t = new Time;
+			Assert::same($v['expected'], $t->set($v['input'], $v['format'])->getRaw());
+		}
 
 		// time factory
-		Assert::same($seconds, (new TimeFactory)->create($seconds)->toSeconds());
+		foreach ($testValues as $v) {
+			$tf1 = new TimeFactory($v['format'], FALSE);
+			$t1 = $tf1->create($v['input']);
+			Assert::type(Time::CLASS, $t1);
+			Assert::same($v['expected'], $t1->getRaw());
+		}
+		foreach ($testValues as $v) {
+			$tf2 = new TimeFactory;
+			$t2 = $tf2->create($v['input'], $v['format']);
+			Assert::type(Time::CLASS, $t2);
+			Assert::same($v['expected'], $t2->getRaw());
+		}
 
-		//TODO ->set()
+		// from *
+		$this->factoryTest('Seconds', Time::SECOND);
+		$this->factoryTest('Minutes', Time::MINUTE);
+		$this->factoryTest('Hours', Time::HOUR);
+		$this->factoryTest('Days', Time::DAY);
+		$this->factoryTest('Weeks', Time::WEEK);
+		Assert::same(2 * Time::WEEK + 3 * Time::DAY + 4 * Time::HOUR + 5 * Time::MINUTE + 6 * Time::SECOND, Time::fromWeeks(2, 3, 4, 5, 6)->getRaw());
+		Assert::same(-2 * Time::WEEK - 3 * Time::DAY - 4 * Time::HOUR - 5 * Time::MINUTE - 6 * Time::SECOND, Time::fromWeeks(-2, -3, -4, -5, -6)->getRaw());
+		Assert::same(0, Time::fromWeeks(0, 0, 0, 0, 0)->getRaw());
 	}
 
 
@@ -491,6 +551,15 @@ class TimeTest extends TestCase
 
 		// clipping
 		Assert::same($expectedResult, $timeObject === $timeObject->clipToDayTime());
+	}
+
+
+	private function factoryTest($factoryMethodSuffix, $coefficient)
+	{
+		Assert::same(14 * $coefficient, Time::{'from' . $factoryMethodSuffix}(14)->getRaw());
+		Assert::same(13 * $coefficient, Time::{'from' . $factoryMethodSuffix}(13)->getRaw());
+		Assert::same(-1 * $coefficient, Time::{'from' . $factoryMethodSuffix}(-1)->getRaw());
+		Assert::same(0 * $coefficient, Time::{'from' . $factoryMethodSuffix}(0)->getRaw());
 	}
 
 }
