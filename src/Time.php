@@ -663,14 +663,15 @@ class Time
 			// regard it as time string
 			return $this->parseFormat($time, $format === NULL || $format === '' ? $this->getFormat() : $format);
 		} elseif (is_array($time)) {
-			// [H, m, s]
-			//TODO what if there are negative values?
-			$h = reset($time) * self::HOUR;
-			$m = next($time) * self::MINUTE;
-			$s = next($time);
-			return $h + $m + $s;
+			// [s, m, h, d, w]
+			$s = reset($time);
+			$m = next($time);
+			$h = next($time);
+			$d = next($time);
+			$w = next($time);
+			return empty($s) ? NULL : self::calculateSeconds($w, $d, $h, $m, $s);
 		} elseif ($time instanceof Carbon) {
-			return $this->parse(array($time->hour, $time->minute, $time->second));
+			return $this->parse(array($time->second, $time->minute, $time->hour));
 		} elseif ($time instanceof DateTime) {
 			return $this->parse($time->format('H:i:s'));
 		}

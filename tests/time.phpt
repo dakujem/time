@@ -381,37 +381,64 @@ class TimeTest extends TestCase
 		/**/
 		// not valid day times
 		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE, Time::create('123:34')->toSeconds());
-		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE + 56, Time::create('123:34:56')->toSeconds());
+		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE + 56 * Time::SECOND, Time::create('123:34:56')->toSeconds());
 		Assert::same(-1 * Time::HOUR - 30 * Time::MINUTE, Time::create('-1:30', '?H:i')->toSeconds());
 		Assert::same(-1 * Time::HOUR + 30 * Time::MINUTE, Time::create('-1:30', '?H:?i')->toSeconds()); // the sign must be before hours and minutes
 		Assert::same(-1 * Time::HOUR - 30 * Time::MINUTE, Time::create('-1:-30', '?H:?i')->toSeconds()); // now the reading is as (probably) expected above
 		Assert::same(1 * Time::HOUR - 30 * Time::MINUTE, Time::create('1:-30', '?H:?i')->toSeconds());
-		Assert::same(-1, Time::create('-0:00:01')->toSeconds());
-		Assert::same(-61, Time::create('-0:01:-01')->toSeconds());
-//		Assert::same(-1, Time::create('-0:01', '?i:s')->toSeconds()); //TODO fix this !
-		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12, Time::create('-123:34:12')->toSeconds());
-		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12, Time::create('-123:-34:+12')->toSeconds()); // only the hour sign matters here!
-		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE + 12, Time::create('+123:-34:+12')->toSeconds()); // only the hour sign matters here!
-		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE + 12, Time::create('-123:-34:+12', '?H:?i:?s')->toSeconds()); // every sign matters
+		Assert::same(-1 * Time::SECOND, Time::create('-0:00:01')->toSeconds());
+		Assert::same(-61 * Time::SECOND, Time::create('-0:01:-01')->toSeconds());
+//		Assert::same(-1 * Time::SECOND, Time::create('-0:01', '?i:s')->toSeconds()); //TODO fix this !
+		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12 * Time::SECOND, Time::create('-123:34:12')->toSeconds());
+		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12 * Time::SECOND, Time::create('-123:-34:+12')->toSeconds()); // only the hour sign matters here!
+		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE + 12 * Time::SECOND, Time::create('+123:-34:+12')->toSeconds()); // only the hour sign matters here!
+		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE + 12 * Time::SECOND, Time::create('-123:-34:+12', '?H:?i:?s')->toSeconds()); // every sign matters
 		/**/
 		// strange formats
-		Assert::same(-1 * Time::HOUR + 30, Time::create('-1:30', '?H:?s')->toSeconds());
-		Assert::same(-1 * Time::HOUR - 30, Time::create('-1:30', 'H:s')->toSeconds());
-		Assert::same(2 * Time::HOUR + 1, Time::create('1:2', 's:H')->toSeconds());
-		Assert::same(2 * Time::MINUTE + 1, Time::create('1:2', 's:i')->toSeconds());
-		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create('3:2:1', 's:i:H')->toSeconds());
-		Assert::same(1 * Time::HOUR + 3 * Time::MINUTE + 2, Time::create('3:2:1', 'i:s:H')->toSeconds());
+		Assert::same(-1 * Time::HOUR + 30 * Time::SECOND, Time::create('-1:30', '?H:?s')->toSeconds());
+		Assert::same(-1 * Time::HOUR - 30 * Time::SECOND, Time::create('-1:30', 'H:s')->toSeconds());
+		Assert::same(2 * Time::HOUR + 1 * Time::SECOND, Time::create('1:2', 's:H')->toSeconds());
+		Assert::same(2 * Time::MINUTE + 1 * Time::SECOND, Time::create('1:2', 's:i')->toSeconds());
+		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3 * Time::SECOND, Time::create('3:2:1', 's:i:H')->toSeconds());
+		Assert::same(1 * Time::HOUR + 3 * Time::MINUTE + 2 * Time::SECOND, Time::create('3:2:1', 'i:s:H')->toSeconds());
 		Assert::same(1 * Time::HOUR, Time::create('1:2:3', 'H')->toSeconds());
 		Assert::same(1 * Time::MINUTE, Time::create('1:2:3', 'i')->toSeconds());
-		Assert::same(1, Time::create('1:2:3', 's')->toSeconds());
+		Assert::same(1 * Time::SECOND, Time::create('1:2:3', 's')->toSeconds());
 
 		// test Carbon
-		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(Carbon::createFromFormat('H:i:s', '1:02:03'))->toSeconds());
-		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(Carbon::createFromFormat('H:i:s', '24:02:03'))->toSeconds()); // this results in 00:02:03 the next day in Carbon
-		/**/
+		$c1 = Carbon::createFromFormat('H:i:s', '1:02:03');
+		Assert::same(1, $c1->hour);
+		Assert::same(2, $c1->minute);
+		Assert::same(3, $c1->second);
+		$c2 = Carbon::createFromFormat('H:i:s', '24:02:03'); // this results in 00:02:03 the next day in Carbon
+		Assert::same(0, $c2->hour);
+		Assert::same(2, $c2->minute);
+		Assert::same(3, $c2->second);
+		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3 * Time::SECOND, Time::create($c1)->toSeconds());
+		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3 * Time::SECOND, Time::create($c2)->toSeconds());
+
 		// test DateTime
-		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(new DateTime('1:02:03'))->toSeconds());
-		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3, Time::create(new DateTime('24:02:03'))->toSeconds());
+		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3 * Time::SECOND, Time::create(new DateTime('1:02:03'))->toSeconds());
+		Assert::same(0 * Time::HOUR + 2 * Time::MINUTE + 3 * Time::SECOND, Time::create(new DateTime('24:02:03'))->toSeconds());
+
+		// arrays
+		Assert::same(TRUE, Time::create([])->isNull());
+		Assert::same(FALSE, Time::create([])->isZero());
+		Assert::same(0, Time::create([])->toSeconds());
+		Assert::same(FALSE, Time::create(['foo', 'bar'])->isNull());
+		Assert::same(TRUE, Time::create(['foo', 'bar'])->isZero());
+		Assert::same(0, Time::create(['foo', 'bar'])->toSeconds());
+		Assert::same(1 * Time::SECOND, Time::create([1])->toSeconds());
+		Assert::same(1 * Time::HOUR + 2 * Time::MINUTE + 3 * Time::SECOND, Time::create([3, 2, 1])->toSeconds());
+		Assert::same(1 * Time::WEEK + 2 * Time::DAY + 3 * Time::HOUR + 4 * Time::MINUTE + 5 * Time::SECOND, Time::create([5, 4, 3, 2, 1])->toSeconds());
+		Assert::same(-1 * Time::WEEK - 2 * Time::DAY - 3 * Time::HOUR - 4 * Time::MINUTE - 5 * Time::SECOND, Time::create([-5, - 4, -3, - 2, - 1])->toSeconds());
+		Assert::same(1 * Time::WEEK - 2 * Time::DAY + 3 * Time::HOUR - 4 * Time::MINUTE - 5 * Time::SECOND, Time::create([-5, - 4, 3, - 2, 1, 'foo', 78554])->toSeconds());
+
+		// null, empty string
+		Assert::same(TRUE, Time::create(NULL)->isNull());
+		Assert::same(FALSE, Time::create(NULL)->isZero());
+		Assert::same(TRUE, Time::create('')->isNull());
+		Assert::same(FALSE, Time::create('')->isZero());
 	}
 
 
