@@ -136,31 +136,33 @@ class TimeTest extends TestCase
 	public function testGetters()
 	{
 		$uninitialized = new Time;
+		Assert::same(TRUE, $uninitialized->isNull());
 		Assert::same(FALSE, $uninitialized->isZero());
 		Assert::same(0, $uninitialized->getSeconds());
 		Assert::same(0, $uninitialized->getMinutes());
 		Assert::same(0, $uninitialized->getHours());
 		Assert::same(FALSE, $uninitialized->isNegative());
+		Assert::same(0, $uninitialized->getSignum());
 
 		Assert::same(0, $uninitialized->toSeconds());
 		Assert::same(0, $uninitialized->toMinutes());
 		Assert::same(0, $uninitialized->toHours());
-		Assert::same(0, $uninitialized->getSignum());
 		Assert::same(0, $uninitialized->toDays());
 		Assert::same(0, $uninitialized->toWeeks());
 
 
 		$timeZero = Time::fromSeconds(0);
+		Assert::same(FALSE, $timeZero->isNULL());
 		Assert::same(TRUE, $timeZero->isZero());
 		Assert::same(0, $timeZero->getSeconds());
 		Assert::same(0, $timeZero->getMinutes());
 		Assert::same(0, $timeZero->getHours());
 		Assert::same(FALSE, $timeZero->isNegative());
+		Assert::same(0, $timeZero->getSignum());
 
 		Assert::same(0, $timeZero->toSeconds());
 		Assert::same(0, $timeZero->toMinutes());
 		Assert::same(0, $timeZero->toHours());
-		Assert::same(0, $timeZero->getSignum());
 		Assert::same(0, $timeZero->toDays());
 		Assert::same(0, $timeZero->toWeeks());
 
@@ -168,6 +170,7 @@ class TimeTest extends TestCase
 		$seconds = 6873 * Time::HOUR + 54 * Time::MINUTE + 18; // 6873 hours 54 minutes 18 seconds
 
 		$time = Time::fromSeconds($seconds);
+		Assert::same(FALSE, $time->isNULL());
 		Assert::same(FALSE, $time->isZero());
 		Assert::same(18, $time->getSeconds());
 		Assert::same(54, $time->getMinutes());
@@ -183,6 +186,7 @@ class TimeTest extends TestCase
 
 
 		$timeNegative = Time::fromSeconds(-1 * $seconds);
+		Assert::same(FALSE, $timeNegative->isNULL());
 		Assert::same(FALSE, $timeNegative->isZero());
 		Assert::same(18, $timeNegative->getSeconds());
 		Assert::same(54, $timeNegative->getMinutes());
@@ -197,15 +201,26 @@ class TimeTest extends TestCase
 		Assert::same(-1 * $seconds / Time::WEEK, $timeNegative->toWeeks());
 
 
-		Assert::same(TRUE, $uninitialized->isNull());
-		Assert::same(FALSE, $timeZero->isNULL());
-		Assert::same(FALSE, $timeNegative->isNULL());
-		Assert::same(FALSE, $time->isNULL());
+		$timeFloat = Time::fromSeconds(0.376);
+		Assert::same(FALSE, $timeFloat->isNULL());
+		Assert::same(FALSE, $timeFloat->isZero());
+		Assert::same(0.376, $timeFloat->getSeconds()); //TODO should it be an integer ??
+		Assert::same(0, $timeFloat->getMinutes());
+		Assert::same(0, $timeFloat->getHours());
+		Assert::same(FALSE, $timeFloat->isNegative());
+		Assert::same(1, $timeFloat->getSignum());
+
+		Assert::same(.376, $timeFloat->toSeconds());
+		Assert::same(.376 / Time::MINUTE, $timeFloat->toMinutes());
+		Assert::same(.376 / Time::HOUR, $timeFloat->toHours());
+		Assert::same(.376 / Time::DAY, $timeFloat->toDays());
+		Assert::same(.376 / Time::WEEK, $timeFloat->toWeeks());
 	}
 
 
 	public function testArithmeticFunctions()
 	{
+		// TODO improve this test
 		//NOTE: all the modifications are accumulated into the Time object.
 
 		$t = Time::fromSeconds(6);

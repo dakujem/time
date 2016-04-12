@@ -422,7 +422,9 @@ class Time
 	 */
 	public function getSeconds()
 	{
-		return (int) abs($this->_get() % self::MINUTE);
+		//TODO should this return integer or float ???
+		$val = $this->_get();
+		return is_float($val) ? abs(fmod($this->_get(), self::MINUTE)) : (int) abs($this->_get() % self::MINUTE);
 	}
 
 
@@ -810,7 +812,7 @@ class Time
 	 */
 	protected function _set($value)
 	{
-		$this->time = $value === NULL ? NULL : (int) $value; // TODO use *self::SECOND instead of (int)
+		$this->time = $value === NULL ? NULL : $value * self::SECOND;
 		return $this;
 	}
 
