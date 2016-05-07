@@ -115,13 +115,17 @@ class Time
 	 * Divide the time by $x:
 	 * $this / $x
 	 *
+	 * Note: division by zero results in INF.
 	 *
 	 * @param int|double $x
-	 * @return static
+	 * @return int|double
 	 */
 	public function div($x)
 	{
-		return $this->_set($this->_get() / $x);
+		if (!is_int($x) && !is_float($x)) {
+			$x = (double) $x;
+		}
+		return $this->_set($x !== 0.0 && $x !== 0 ? $this->_get() / $x : INF);
 	}
 
 
@@ -129,13 +133,17 @@ class Time
 	 * Modulate the time by $x:
 	 * $this % $x
 	 *
+	 * Note: division by zero results in NAN.
 	 *
-	 * @param int $x
-	 * @return static
+	 * @param int|double $x
+	 * @return int|double
 	 */
 	public function mod($x)
 	{
-		return $this->_set($this->_get() % $x);
+		if (!is_int($x) && !is_float($x)) {
+			$x = (double) $x;
+		}
+		return $this->_set($x !== 0.0 && $x !== 0 ? (is_int($this->_get()) && is_int($x) ? $this->_get() % $x : fmod($this->_get(), $x)) : NAN );
 	}
 
 
@@ -278,7 +286,7 @@ class Time
 	 */
 	public function clipToDayTime()
 	{
-		$t = $this->_get() % self::DAY;
+		$t = is_int($this->_get()) ? $this->_get() % self::DAY : fmod($this->_get(), self::DAY);
 		return $this->_set($t < 0 ? $t + self::DAY : $t);
 	}
 

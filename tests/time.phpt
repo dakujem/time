@@ -220,8 +220,7 @@ class TimeTest extends TestCase
 
 	public function testArithmeticFunctions()
 	{
-		// TODO improve this test
-		//NOTE: all the modifications are accumulated into the Time object.
+		//NOTE: all the modifications are accumulated into the Time object instance.
 
 		$t = Time::fromSeconds(6);
 		// add
@@ -238,6 +237,30 @@ class TimeTest extends TestCase
 		$t->add(Time::fromSeconds(6)); // 0+6
 		Assert::same(2, $t->mod(4)->toSeconds()); // 6 % 4
 		Assert::same(-1 % 4, Time::fromSeconds(-1)->mod(4)->toSeconds());
+
+		
+		// a more general test follows
+		$vals = [0, 1, -1, 0.01, 954676.35435, -53456123.25667,];
+		$bases = [NULL, 0, 1, -100, -1, 5.4, -3.7];
+		foreach ($bases as $base) {
+			$time = new Time($base);
+			foreach ($vals as $val) {
+				Assert::same($base + $val, $time->copy()->add($val)->getRaw());
+				Assert::same($base - $val, $time->copy()->sub($val)->getRaw());
+				Assert::same($base * $val, $time->copy()->mult($val)->getRaw());
+				Assert::same($val != 0 ? $base / $val : INF, $time->copy()->div($val)->getRaw());
+				if ($val != 0) {
+					$real = $time->copy()->mod($val)->getRaw();
+					$expected = is_int($val) && is_int($base) ? $base % $val : fmod($base, $val);
+					Assert::same($expected, $real);
+				} else {
+					Assert::nan($time->copy()->mod($val)->getRaw());
+				}
+			}
+		}
+
+		//Note: when a Time instance contains NAN or INF, all the following manipulations with the instance result in NAN or INF
+		
 	}
 
 
@@ -264,7 +287,8 @@ class TimeTest extends TestCase
 		Assert::same(2, $t->copy()->subSeconds(-2)->toSeconds());
 
 		// clipping
-		Assert::same(Time::DAY - 1, Time::fromSeconds(-1)->clipToDayTime()->toSeconds());
+		Assert::same(Time::DAY - 1, Time::fromSeconds(-1)->clipToDayTime()->getRaw());
+		Assert::same(Time::DAY - 0.1, Time::fromSeconds(-0.1)->clipToDayTime()->getRaw());
 		Assert::same(0, Time::fromSeconds(Time::DAY)->clipToDayTime()->toSeconds());
 		Assert::same(1, Time::fromSeconds(1)->clipToDayTime()->toSeconds());
 	}

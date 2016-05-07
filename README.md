@@ -24,8 +24,6 @@ Your data may be stored in seconds, minutes, hours or in formatted strings, work
 ```
 
 
-TODO which PHP do I actually target?
-
 ## Installation
 The easiest way to install Time is to use [Composer](https://getcomposer.org/). Just add `"dakujem/time"` to the "require" section in your `composer.json` file, like this:
 ```json
@@ -35,6 +33,9 @@ The easiest way to install Time is to use [Composer](https://getcomposer.org/). 
 	}
 }
 ```
+
+Note: `dakujem/time` is built for and tested to run on PHP 5.6 and PHP 7 and above, however, it should also run on PHP 5.4 and 5.5.
+
 
 ----
 
