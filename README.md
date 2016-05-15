@@ -1,6 +1,6 @@
 # Time
 
-A simple to use powerful class that makes working with time and temporal data easy.
+A no-nonsense library for working with time and temporal data the easy way.
 
 On the contrary to DateTime or Carbon (nesbot/carbon), `Time` is simply a container for time measured in seconds,
 it does not refer to any real point-in-time, there are no time zones no nothing.
