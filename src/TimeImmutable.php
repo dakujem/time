@@ -19,7 +19,7 @@ class TimeImmutable extends Time
 
 	/**
 	 * Set the default output and input time format.
-	 * @note: produces a copy of self.
+	 * @note: produces a copy of self internally.
 	 *
 	 *
 	 * @param string $format
@@ -35,7 +35,7 @@ class TimeImmutable extends Time
 
 	/**
 	 * Internal setter.
-	 * @note: produces a copy of self.
+	 * @note: produces a copy of self internally.
 	 * @internal
 	 */
 	protected function _set($value)
@@ -49,7 +49,7 @@ class TimeImmutable extends Time
 	/**
 	 * Initializes the object.
 	 * @internal
-	 * @note this method breaks the immutability!
+	 * @note using this method breaks the immutability!
 	 */
 	protected function init($time, $format)
 	{
@@ -61,7 +61,7 @@ class TimeImmutable extends Time
 	/**
 	 * An override method used for initialization purposes only.
 	 * @internal
-	 * @note this method breaks the immutability!
+	 * @note using this method breaks the immutability!
 	 */
 	protected function _setMutableOverride($value)
 	{
@@ -72,7 +72,7 @@ class TimeImmutable extends Time
 	/**
 	 * An override method used for initialization purposes only.
 	 * @internal
-	 * @note this method breaks the immutability!
+	 * @note using this method breaks the immutability!
 	 */
 	protected function _setFormatMutableOverride($format)
 	{

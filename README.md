@@ -46,8 +46,9 @@ Time::fromHours(10)->div(2) // 5 hours
 Time::fromWeeks(4)->toSeconds() // 2419200
 Time::fromDays(3.5)->toWeeks()  // 0.5
 
-// options to create the time object: constructor, create, fromSeconds, fromMinutes, fromHours, fromDays, fromWeeks
-new Time('12:20') == Time::create(12:20)
+// options to create the time object:
+//   constructor, create, fromSeconds, fromMinutes, fromHours, fromDays, fromWeeks
+new Time('12:20') == Time::create('12:20')
 Time::fromDays(4)
 
 // string time parsing (reading)
@@ -61,7 +62,7 @@ Time::create('-10:30')
 
 // converting to DateTime or Carbon: toDateTime, toCarbon
 $carbon = (string) Time::create(123)->toCarbon();
-$dt = (string) Time::create('07:50 AM')->toDateTime();
+$datetm = (string) Time::create('07:50 AM')->toDateTime();
 
 // clipping to valid day time
 (string) Time::create(-1); // -00:00:01
@@ -78,13 +79,16 @@ The default `Time` object is **mutable**.
 ```php
 $time = Time::fromSeconds(0);
 (string) $time->addSeconds(30)->mult(2); // "00:01:00"
-$time->getMinutes(); // 1  -- the modifications are accumulated inside the Time instance
+// the modifications are accumulated inside the Time instance:
+$time->getMinutes(); // 1
 ```
 Sometimes one needs to treat a time object as an **immutable object**, the solution is the `TimeImmutable` class.
 ```php
 $immutable = TimeImmutable::fromSeconds(0);
-(string) $immutable->addSeconds(30)->mult(2); // "00:01:00"  -- all the operations work as expected
-$immutable->getMinutes(); // 0  -- but the instance itself does not change - this is in contrast to the default Time object
+// all the operations work as expected:
+(string) $immutable->addSeconds(30)->mult(2); // "00:01:00"
+// but the instance itself does not change - this is in contrast to the default Time object:
+$immutable->getMinutes(); // 0
 ```
 Once a `TimeImmutable` instance is initialized, its value does not change. Upon any modification a new instance is returned.
 
