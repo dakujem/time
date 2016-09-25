@@ -52,17 +52,17 @@ new Time('12:20') == Time::create('12:20')
 Time::fromDays(4)
 
 // string time parsing (reading)
-Time::create('10:30 PM')
-Time::create('23:59:59')
-Time::create('-10:30')
+TimeHelper::parse('23:59:59') == Time::create('23:59:59')
+TimeHelper::parse('-10:30')
+Time::create(TimeHelper::parse('10:30 PM', TimeHelper::FORMAT_HMA)) // custom format
 
 // output formatting
 (string) Time::create(123)->format(Time::FORMAT_HM); // 00:02 - custom format (HH:mm)
 (string) Time::fromHours(2, 3, 4); // 02:03:04 - the default format (HH:mm:ss)
 
 // converting to DateTime or Carbon: toDateTime, toCarbon
-$carbon = (string) Time::create(123)->toCarbon();
-$datetm = (string) Time::create('07:50 AM')->toDateTime();
+$carbon = Time::create(123)->toCarbon();
+$datetm = Time::create('07:50 AM')->toDateTime();
 
 // clipping to valid day time
 (string) Time::create(-1); // -00:00:01
@@ -75,22 +75,30 @@ For all the methods, please refer to the source code.
 
 ## Mutable and Immutable Time objects
 
-The default `Time` object is **mutable**.
+The default `Time` object is **immutable**.
+It means that once a `Time` instance is created, its value does not change. Upon any modification a new instance is returned.
 ```php
-$time = Time::fromSeconds(0);
-(string) $time->addSeconds(30)->mult(2); // "00:01:00"
-// the modifications are accumulated inside the Time instance:
-$time->getMinutes(); // 1
-```
-Sometimes one needs to treat a time object as an **immutable object**, the solution is the `TimeImmutable` class.
-```php
-$immutable = TimeImmutable::fromSeconds(0);
+$immutable = Time::fromSeconds(0);
 // all the operations work as expected:
 (string) $immutable->addSeconds(30)->mult(2); // "00:01:00"
-// but the instance itself does not change - this is in contrast to the default Time object:
+// but the instance itself does not change - this is in contrast to the mutable TimeMutable object:
 $immutable->getMinutes(); // 0
 ```
-Once a `TimeImmutable` instance is initialized, its value does not change. Upon any modification a new instance is returned.
+Sometimes one needs to treat a time object as a **mutable object**, an accumulator, the solution is the `TimeMutable` class.
+```php
+$mutable = TimeMutable::fromSeconds(0);
+(string) $mutable->addSeconds(30)->mult(2); // "00:01:00"
+// the modifications are accumulated inside the TimeMutable instance:
+$mutable->getMinutes(); // 1
+```
+`TimeMutable` may be useful for aggregations:
+```php
+$acc = new TimeMutable();
+foreach(... as $foo){
+    $acc->add($foo->getDuration());
+}
+print $acc;
+```
 
 
 ## Installation
