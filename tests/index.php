@@ -8,6 +8,10 @@
 $dir = '.';
 
 // run the test
-$time = microtime(TRUE);
+$time1 = microtime(TRUE);
+require_once($dir . '/helper.phpt');
+print '<hr/><pre>helper.phpt | Finished at: ' . date('Y-m-d H:i:s') . ' | Runtime: ' . (microtime(TRUE) - $time1 ) . 's</pre>';
+
+$time2 = microtime(TRUE);
 require_once($dir . '/time.phpt');
-print '<hr/><pre>time.phpt | Finished at: ' . date('Y-m-d H:i:s') . ' | Runtime: ' . (microtime(TRUE) - $time ) . 's</pre>';
+print '<hr/><pre>time.phpt | Finished at: ' . date('Y-m-d H:i:s') . ' | Runtime: ' . (microtime(TRUE) - $time2 ) . 's</pre>';

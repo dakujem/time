@@ -9,7 +9,7 @@ namespace Dakujem;
  * Use it to create Time or TimeImmutable objects with a certain format setting
  * and/or when you do not want to call static factories of the time objects in your code.
  *
- * TimeFactory::$immutable flag determins, which of the two time objects will be created - Time or TimeImmutable.
+ * TimeFactory::$immutable flag determins, which of the two time objects will be created - Time (immutable) or TimeMutable.
  * TimeFactory::$format will be set to all created classes.
  *
  * 
@@ -17,8 +17,8 @@ namespace Dakujem;
  */
 class TimeFactory
 {
-	private $format = Time::FORMAT_HMS;
-	private $immutable = FALSE;
+	private $format = TimeHelper::FORMAT_HMS;
+	private $immutable = TRUE;
 
 
 	public function __construct($format = NULL, $immutable = NULL)
@@ -30,7 +30,11 @@ class TimeFactory
 
 	public function create($time = NULL, $format = NULL)
 	{
-		return $this->getImmutable() ? new TimeImmutable($time, $format) : new Time($time, $format);
+		if ($format === NULL) {
+			$format = $this->getFormat();
+		}
+		$parsed = TimeHelper::parse($time, $format);
+		return $this->getImmutable() ? new Time($parsed) : new TimeMutable($parsed);
 	}
 
 
