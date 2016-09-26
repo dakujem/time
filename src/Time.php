@@ -383,19 +383,17 @@ class Time implements TimeInterface
 
 
 	/**
-	 * Return the seconds part of the time.
-	 * WARNING: this does not return the time converted to seconds! For that purpose, use the toSeconds() method.
+	 * Return the hour part of the time.
+	 * WARNING: this does not return the time converted to hours! For that purpose, use the toHours() method.
 	 *
 	 *  HH:MM:SS
-	 *        \/
+	 *  \/
 	 *
 	 * @return int
 	 */
-	public function getSeconds()
+	public function getHours()
 	{
-		//TODO should this return integer or float ???
-		$val = $this->_get();
-		return is_float($val) ? abs(fmod($this->_get(), self::MINUTE)) : (int) abs($this->_get() % self::MINUTE);
+		return (int) abs((int) ($this->_get() / self::HOUR));
 	}
 
 
@@ -415,17 +413,19 @@ class Time implements TimeInterface
 
 
 	/**
-	 * Return the hour part of the time.
-	 * WARNING: this does not return the time converted to hours! For that purpose, use the toHours() method.
+	 * Return the seconds part of the time.
+	 * WARNING: this does not return the time converted to seconds! For that purpose, use the toSeconds() method.
 	 *
 	 *  HH:MM:SS
-	 *  \/
+	 *        \/
 	 *
 	 * @return int
 	 */
-	public function getHours()
+	public function getSeconds()
 	{
-		return (int) abs((int) ($this->_get() / self::HOUR));
+		//TODO should this return integer or float ???
+		$val = $this->_get();
+		return is_float($val) ? abs(fmod($this->_get(), self::MINUTE)) : (int) abs($this->_get() % self::MINUTE);
 	}
 
 
