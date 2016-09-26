@@ -12,9 +12,6 @@ use Carbon\Carbon,
  * TimeHelper.
  *
  *
- * @todo custom callback formatter ??
- *
- *
  * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
  */
 class TimeHelper
@@ -113,7 +110,7 @@ class TimeHelper
 
 
 	/**
-	 * @todo sign handling should be improved
+	 * @note: sign handling should be improved
 	 */
 	private static function parseFormat($value, $format)
 	{
@@ -186,7 +183,7 @@ class TimeHelper
 				$m = !$mneg ? $m : -$m;
 				$s = !$sneg ? $s : -$s;
 			}
-			//TODO this does not cover the case when format "?i:s" is used
+			// NOTE: this does not cover the case when format "?i:s" is used
 		}
 
 		// 4/ -----------------------------------------------------------------------------------------
