@@ -132,6 +132,7 @@ class TimeTest extends TestCase
 		Assert::same(0, $uninitialized->getSeconds());
 		Assert::same(0, $uninitialized->getMinutes());
 		Assert::same(0, $uninitialized->getHours());
+		Assert::same(NULL, $uninitialized->getSecondFraction());
 		Assert::same(FALSE, $uninitialized->isNegative());
 		Assert::same(0, $uninitialized->getSignum());
 
@@ -148,6 +149,7 @@ class TimeTest extends TestCase
 		Assert::same(0, $timeZero->getSeconds());
 		Assert::same(0, $timeZero->getMinutes());
 		Assert::same(0, $timeZero->getHours());
+		Assert::same(NULL, $timeZero->getSecondFraction());
 		Assert::same(FALSE, $timeZero->isNegative());
 		Assert::same(0, $timeZero->getSignum());
 
@@ -166,6 +168,7 @@ class TimeTest extends TestCase
 		Assert::same(18, $time->getSeconds());
 		Assert::same(54, $time->getMinutes());
 		Assert::same(6873, $time->getHours());
+		Assert::same(NULL, $time->getSecondFraction());
 		Assert::same(FALSE, $time->isNegative());
 		Assert::same(1, $time->getSignum());
 
@@ -182,6 +185,7 @@ class TimeTest extends TestCase
 		Assert::same(18, $timeNegative->getSeconds());
 		Assert::same(54, $timeNegative->getMinutes());
 		Assert::same(6873, $timeNegative->getHours());
+		Assert::same(NULL, $timeNegative->getSecondFraction());
 		Assert::same(TRUE, $timeNegative->isNegative());
 		Assert::same(-1, $timeNegative->getSignum());
 
@@ -195,9 +199,10 @@ class TimeTest extends TestCase
 		$timeFloat = Time::fromSeconds(0.376);
 		Assert::same(FALSE, $timeFloat->isNULL());
 		Assert::same(FALSE, $timeFloat->isZero());
-		Assert::same(0.376, $timeFloat->getSeconds()); //TODO should it be an integer ??
+		Assert::same(0, $timeFloat->getSeconds());
 		Assert::same(0, $timeFloat->getMinutes());
 		Assert::same(0, $timeFloat->getHours());
+		Assert::same(0.376, $timeFloat->getSecondFraction());
 		Assert::same(FALSE, $timeFloat->isNegative());
 		Assert::same(1, $timeFloat->getSignum());
 

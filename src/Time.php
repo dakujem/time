@@ -416,16 +416,29 @@ class Time implements TimeInterface
 	 * Return the seconds part of the time.
 	 * WARNING: this does not return the time converted to seconds! For that purpose, use the toSeconds() method.
 	 *
-	 *  HH:MM:SS
+	 *  HH:MM:SS.frac
 	 *        \/
 	 *
 	 * @return int
 	 */
 	public function getSeconds()
 	{
-		//TODO should this return integer or float ???
+		return (int) abs((int) $this->_get() % self::MINUTE);
+	}
+
+
+	/**
+	 * Return the remaining fraction of a second. Returns NULL when the time value is integer.
+	 *
+	 *  HH:MM:SS.frac
+	 *           \__/
+	 *
+	 * @return double|NULL
+	 */
+	public function getSecondFraction()
+	{
 		$val = $this->_get();
-		return is_float($val) ? abs(fmod($this->_get(), self::MINUTE)) : (int) abs($this->_get() % self::MINUTE);
+		return is_float($val) ? abs(fmod($val, self::SECOND)) : NULL;
 	}
 
 

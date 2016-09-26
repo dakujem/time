@@ -264,15 +264,15 @@ interface TimeInterface
 
 
 	/**
-	 * Return the seconds part of the time.
-	 * WARNING: this does not return the time converted to seconds! For that purpose, use the toSeconds() method.
+	 * Return the hour part of the time.
+	 * WARNING: this does not return the time converted to hours! For that purpose, use the toHours() method.
 	 *
 	 *  HH:MM:SS
-	 *        \/
+	 *  \/
 	 *
 	 * @return int
 	 */
-	function getSeconds();
+	function getHours();
 
 
 	/**
@@ -288,15 +288,26 @@ interface TimeInterface
 
 
 	/**
-	 * Return the hour part of the time.
-	 * WARNING: this does not return the time converted to hours! For that purpose, use the toHours() method.
+	 * Return the seconds part of the time.
+	 * WARNING: this does not return the time converted to seconds! For that purpose, use the toSeconds() method.
 	 *
-	 *  HH:MM:SS
-	 *  \/
+	 *  HH:MM:SS.frac
+	 *        \/
 	 *
 	 * @return int
 	 */
-	function getHours();
+	public function getSeconds();
+
+
+	/**
+	 * Return the remaining fraction of a second. Returns NULL when the time value is integer.
+	 *
+	 *  HH:MM:SS.frac
+	 *           \__/
+	 *
+	 * @return double|NULL
+	 */
+	public function getSecondFraction();
 
 
 	/**
