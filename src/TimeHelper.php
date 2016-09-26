@@ -11,6 +11,11 @@ use Carbon\Carbon,
 /**
  * TimeHelper.
  *
+ * Note:	only time formats defined in constants are supported officially,
+ *			however, the use of custom formats is possible.
+ *			Avoiding funny formats is advisable though.
+ *			Known not to work (parsing): "?i:s"
+ *
  *
  * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
  */

@@ -147,7 +147,7 @@ class TimeHelperTest extends TestCase
 		Assert::same(1 * Time::HOUR - 30 * Time::MINUTE, TimeHelper::parse('1:-30', '?H:?i'));
 		Assert::same(-1 * Time::SECOND, TimeHelper::parse('-0:00:01'));
 		Assert::same(-61 * Time::SECOND, TimeHelper::parse('-0:01:-01'));
-//		Assert::same(-1 * Time::SECOND, TimeHelper::parse('-0:01', '?i:s')); //TODO fix this !
+//		Assert::same(-1 * Time::SECOND, TimeHelper::parse('-0:01', '?i:s')); // NOTE: fix this !
 		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12 * Time::SECOND, TimeHelper::parse('-123:34:12'));
 		Assert::same(-123 * Time::HOUR - 34 * Time::MINUTE - 12 * Time::SECOND, TimeHelper::parse('-123:-34:+12')); // only the hour sign matters here!
 		Assert::same(123 * Time::HOUR + 34 * Time::MINUTE + 12 * Time::SECOND, TimeHelper::parse('+123:-34:+12')); // only the hour sign matters here!
