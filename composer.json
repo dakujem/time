@@ -1,14 +1,14 @@
 {
 	"name": "dakujem/time",
 
-	"description": "A no-nonsense library for working with time and temporal data the easy way.",
+	"description": "A no-nonsense library for working with time and doing temporal calculations the easy way.",
     "keywords": ["time","utilities","utility"],
     "license": "GNU GPL v3",
 
 	"type": "library",
 	"authors": [
 		{
-			"name": "Andrej Rypak",
+			"name": "Andrej Rypák",
 			"email": "xrypak@gmail.com"
 		}
 	],
