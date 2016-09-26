@@ -70,7 +70,7 @@ Time::fromDays(3.5)->toWeeks()  // 0.5
 Input parsing (reading) and output formatting:
 ```php
 // string time parsing (reading)
-TimeHelper::parse('23:59:59') == Time::create('23:59:59')
+Time::create('23:59:59')->toSeconds() == TimeHelper::parse('23:59:59')
 TimeHelper::parse('-10:30')
 Time::create(TimeHelper::parse('10:30 PM', TimeHelper::FORMAT_HMA)) // custom format
 
