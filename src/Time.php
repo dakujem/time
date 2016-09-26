@@ -3,9 +3,9 @@
 
 namespace Dakujem;
 
-use Carbon\Carbon;
-use DateTime;
-use RuntimeException;
+use Carbon\Carbon,
+	DateTime,
+	RuntimeException;
 
 
 /**
@@ -106,7 +106,7 @@ class Time implements TimeInterface
 		if (!is_int($x) && !is_float($x)) {
 			$x = (double) $x;
 		}
-		return $this->_set($x !== 0.0 && $x !== 0 ? (is_int($this->_get()) && is_int($x) ? $this->_get() % $x : fmod($this->_get(), $x)) : NAN );
+		return $this->_set($x !== 0.0 && $x !== 0 ? (is_int($this->_get()) && is_int($x) ? $this->_get() % $x : fmod($this->_get(), $x)) : NAN);
 	}
 
 

@@ -85,13 +85,11 @@ class TimeHelper
 	 */
 	public static function parse($time, $format = NULL)
 	{
-		if ($time instanceof TimeInterface) {
-			return $time->toSeconds();
-		} elseif ($time === NULL || $time === '') {
-			return NULL;
-		} elseif (is_numeric($time)) {
+		if (is_numeric($time)) {
 			// regard it as seconds
 			return $time;
+		} elseif ($time === NULL || $time === '') {
+			return NULL;
 		} elseif (is_string($time)) {
 			// regard it as time string
 			return self::parseFormat($time, $format === NULL ? self::$defaultFormat : $format);
@@ -103,6 +101,8 @@ class TimeHelper
 			$d = next($time);
 			$w = next($time);
 			return empty($s) ? NULL : self::calculateSeconds($w, $d, $h, $m, $s);
+		} elseif ($time instanceof TimeInterface) {
+			return $time->toSeconds();
 		} elseif ($time instanceof Carbon) {
 			return self::parse(array($time->second, $time->minute, $time->hour));
 		} elseif ($time instanceof DateTime) {

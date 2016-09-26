@@ -6,16 +6,18 @@ namespace Dakujem;
 
 /**
  * TimeFactory - a factory service.
- * Use it to create Time or TimeImmutable objects with a certain format setting
- * and/or when you do not want to call static factories of the time objects in your code.
+ *
+ * It can be used to create Time or TimeMutable objects with parsing input beforehand.
+ * Its advantage for users is the ability to specify the input format (for parsing strings).
+ * The factory can also be used when static factory calls of the time objects in code are not desired.
  *
  * TimeFactory::$immutable flag determins, which of the two time objects will be created - Time (immutable) or TimeMutable.
- * TimeFactory::$format will be set to all created classes.
+ * TimeFactory::$format will be passed to the TimeHelper::parse($rawTime, $format) call.
  *
  * 
  * @author Andrej Rypak <xrypak@gmail.com>
  */
-class TimeFactory
+final class TimeFactory
 {
 	private $format = TimeHelper::FORMAT_HMS;
 	private $immutable = TRUE;
@@ -28,13 +30,13 @@ class TimeFactory
 	}
 
 
-	public function create($time = NULL, $format = NULL)
+	public function create($rawTime = NULL, $format = NULL)
 	{
 		if ($format === NULL) {
 			$format = $this->getFormat();
 		}
-		$parsed = TimeHelper::parse($time, $format);
-		return $this->getImmutable() ? new Time($parsed) : new TimeMutable($parsed);
+		$seconds = TimeHelper::parse($rawTime, $format);
+		return $this->getImmutable() ? new Time($seconds) : new TimeMutable($seconds);
 	}
 
 

@@ -343,13 +343,4 @@ interface TimeInterface
 	 */
 	function toWeeks();
 
-
-	/**
-	 * Create and return a copy of self.
-	 *
-	 *
-	 * @return static a copy of the original Time object, for fluent calls
-	 */
-	function copy();
-
 }
