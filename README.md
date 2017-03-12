@@ -50,10 +50,10 @@ Comparisons:
 (new Time('12:00'))->between('12:30', '11:30') // TRUE
 ```
 
-Adding / substracting seconds, minutes, hours, days or weeks:
+Adding / subtracting seconds, minutes, hours, days or weeks:
 ```php
 // adding values: addSeconds, addMinutes, addHours, addDays, addWeeks
-// substracting values: subSeconds, subMinutes, subHours, subDays, subWeeks
+// subtracting values: subSeconds, subMinutes, subHours, subDays, subWeeks
 (string) Time::create(123) //  00:02:03
         ->addSeconds(10)   //  00:02:13
         ->addSeconds(-10)  //  00:02:03
