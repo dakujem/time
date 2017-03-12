@@ -47,7 +47,7 @@ class Time implements TimeInterface
 
 
 	/**
-	 * Substract given time value:
+	 * Subtract given time value:
 	 * $this - $time
 	 *
 	 *
