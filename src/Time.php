@@ -11,7 +11,8 @@ use Carbon\Carbon,
 /**
  * Time object.
  *
- * Note: internally, the time is kept in seconds, so the minimum resolution is one second.
+ * Note:	internally, the time is kept in seconds, so the maximum supported resolution is one second.
+ * 			It is possible to use floating point numbers though.
  *
  *
  * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
@@ -666,11 +667,11 @@ class Time implements TimeInterface
 	private static function calculateSeconds($weeks, $days, $hours, $minutes, $seconds)
 	{
 		return
-				$weeks * self::WEEK +
-				$days * self::DAY +
-				$hours * self::HOUR +
-				$minutes * self::MINUTE +
-				$seconds * self::SECOND
+				(is_numeric($weeks) ? $weeks : (int) $weeks ) * self::WEEK +
+				(is_numeric($days) ? $days : (int) $days ) * self::DAY +
+				(is_numeric($hours) ? $hours : (int) $hours ) * self::HOUR +
+				(is_numeric($minutes) ? $minutes : (int) $minutes ) * self::MINUTE +
+				(is_numeric($seconds) ? $seconds : (int) $seconds ) * self::SECOND
 		;
 	}
 

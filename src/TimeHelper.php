@@ -12,9 +12,9 @@ use Carbon\Carbon,
  * TimeHelper.
  *
  * Note:	only time formats defined in constants are supported officially,
- *			however, the use of custom formats is possible.
- *			Avoiding funny formats is advisable though.
- *			Known not to work (parsing): "?i:s"
+ * 			however, the use of custom formats is possible.
+ * 			Avoiding funny formats is advisable though.
+ * 			Known not to work (parsing): "?i:s"
  *
  *
  * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
@@ -228,11 +228,12 @@ class TimeHelper
 	private static function calculateSeconds($weeks, $days, $hours, $minutes, $seconds)
 	{
 		return
-				$weeks * TimeInterface::WEEK +
-				$days * TimeInterface::DAY +
-				$hours * TimeInterface::HOUR +
-				$minutes * TimeInterface::MINUTE +
-				$seconds * TimeInterface::SECOND
+				(is_numeric($weeks) ? $weeks : (int) $weeks ) * TimeInterface::WEEK +
+				(is_numeric($days) ? $days : (int) $days ) * TimeInterface::DAY +
+				(is_numeric($hours) ? $hours : (int) $hours ) * TimeInterface::HOUR +
+				(is_numeric($minutes) ? $minutes : (int) $minutes ) * TimeInterface::MINUTE +
+				(is_numeric($seconds) ? $seconds : (int) $seconds ) * TimeInterface::SECOND
+
 		;
 	}
 
