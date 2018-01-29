@@ -138,7 +138,7 @@ The default format is stored in `TimeHelper::$defaultFormat` static variable and
 However, it is always more flexible to use a factory and pass `Time` instances into calculations:
 ```php
 $timeFactory = new TimeFactory();
-$timeFactoryTime->create('23:59:59')->sub($timeFactoryTime->create('12:30'))
+$timeFactory->create('23:59:59')->sub($timeFactory->create('12:30'))
 ```
 This way the format of the input can be changed at runtime and can be set for all the factories independently.
 The factories can also be implemented in custom way and use custom parsers.
@@ -177,7 +177,3 @@ The easiest way to install Time is to use [Composer](https://getcomposer.org/). 
 
 > **Note**: `dakujem/time` is built for and tested to run on PHP 5.6 and PHP 7 and above, however, it should also run on PHP 5.4 and 5.5 if needed.
 
-
-----
-
-> **Warning**: This library is provided **as-is** with absolutely **no warranty** nor any liability from its contributors for anything it's usage, manipulation or distribution may cause.
