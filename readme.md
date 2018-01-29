@@ -152,9 +152,9 @@ The same principle is true for formatting. Converting the time objects to string
 
 ## Milliseconds, microseconds...
 
-The `Time` object is built for calculations in **seconds**, which is the maximum resolution for which all the features work.
+The `Time` object is built for calculations in **seconds**, which is the maximum integer resolution for which all the features work.
 
-However, it is also possible to use time as double to get heigher resolution (milliseconds or microseconds):
+However, it is possible to use `double` time values to get heigher resolution (milliseconds or microseconds):
 ```php
 Time::create(5.500) // 5.5 seconds
 ```
