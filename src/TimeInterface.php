@@ -20,14 +20,14 @@ interface TimeInterface
 	//
 	const SECOND = 1;
 	const MINUTE = 60;
-	const HOUR = 3600; //   60 * 60
-	const DAY = 86400; //   60 * 60 * 24
-	const WEEK = 604800; // 60 * 60 * 24 * 7
+	const HOUR = 3600; //          60 * 60
+	const DAY = 86400; //          60 * 60 * 24
+	const WEEK = 604800; //        60 * 60 * 24 * 7
 	const HOUR_MINUTES = 60;
-	const DAY_MINUTES = 1440; //   60 * 24
+	const DAY_MINUTES = 1440; //        60 * 24
 	const WEEK_MINUTES = 10080; // 60 * 60 * 24
 	const DAY_HOURS = 24;
-	const WEEK_HOURS = 168; // 24 * 7
+	const WEEK_HOURS = 168; //               24 * 7
 	const WEEK_DAYS = 7;
 
 	/**/

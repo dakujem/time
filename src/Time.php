@@ -11,8 +11,8 @@ use Carbon\Carbon,
 /**
  * Time object.
  *
- * Note:	internally, the time is kept in seconds, so the maximum supported resolution is one second.
- * 			It is possible to use floating point numbers though.
+ * Note:	internally, the time is kept in seconds, so the maximum supported integer resolution is one second.
+ * 			It is possible to use floating point numbers to keep fractions of seconds (milliseconds, microseconds, etc.).
  *
  *
  * @author Andrej Rypak (dakujem) <xrypak@gmail.com>
@@ -20,7 +20,7 @@ use Carbon\Carbon,
 class Time implements TimeInterface
 {
 	/**
-	 * @var int|NULL the time in seconds.
+	 * @var int|double|NULL the time in seconds.
 	 */
 	protected $time = NULL;
 
