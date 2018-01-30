@@ -61,7 +61,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## GNU General Public License
 
-Any of the following GPL licenses may be used, for the full license text see below:
+Copyright (c) 2018 Andrej Rypák (https://github.com/dakujem)
 
-- [GPL version 2](http://www.gnu.org/licenses/gpl-2.0.html)
-- [GPL version 3](http://www.gnu.org/licenses/gpl-3.0.html)
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License,
+version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+
+Either version 2, version 3 or later can be used,
+for the full license text see below:
+
+- [GPL version 2](https://www.gnu.org/licenses/gpl-2.0.html)
+- [GPL version 3](https://www.gnu.org/licenses/gpl-3.0.html)
