@@ -186,3 +186,11 @@ Alternatively, add `"dakujem/time"` to the "require" section in your `composer.j
 
 > **Note**: `dakujem/time` is built for and tested to run on PHP 5.6 and PHP 7 and above, however, it should also run on PHP 5.4 and 5.5 if needed.
 
+
+## Testing
+
+Run CLI command:
+
+`$` `composer test`
+
+Or open `tests/index.php` in a browser.

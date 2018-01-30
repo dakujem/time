@@ -8,21 +8,29 @@
 
 namespace Dakujem\Time\Test;
 
+use Tester\Assert,
+	Tester\Environment,
+	Tracy\Debugger;
+use function getallheaders;
+
 define('ROOT', __DIR__);
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
-use Tracy\Debugger,
-	Tester\Environment;
+if (!class_exists(Assert::class)) {
+	echo "Install Nette Tester using `composer update --dev`\n";
+	exit(1);
+}
 
 // tester
 Environment::setup();
 
 // debugging
-Debugger::$strictMode = TRUE;
-Debugger::enable();
-Debugger::$maxDepth = 10;
-Debugger::$maxLen = 500;
+if (function_exists('getallheaders') && !empty(getallheaders()) && class_exists(Debugger::class)) {
+	Debugger::$strictMode = TRUE;
+	Debugger::enable();
+	Debugger::$maxDepth = 10;
+	Debugger::$maxLen = 500;
+}
 
 
 // dump shortcut
