@@ -150,6 +150,12 @@ Time::create(TimeHelper::parse('23:59:59'))->sub(TimeHelper::parse('10:30 PM', T
 
 The same principle is true for formatting. Converting the time objects to string is done using the format stored in `TimeHelper::$defaultFormat`, that is `HH:MM:SS` by default.
 
+> **Note**
+>
+> Parsing and printing of "funny" formats (like "i:H", "?i:s") is not advised with negative numbers. It is best to only parse standard time representations.
+> If special time formats need to be parsed, own parser should be provided and *Time* library used for calculations afterwards.
+
+
 ## Milliseconds, microseconds...
 
 The `Time` object is built for calculations in **seconds**, which is the maximum integer resolution for which all the features work.
