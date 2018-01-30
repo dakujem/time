@@ -2,7 +2,7 @@
 	"name": "dakujem/time",
 	"description": "A no-nonsense library for working with time and doing temporal calculations the easy way.",
 	"keywords": ["time", "utilities", "utility"],
-	"license": ["BSD-2-Clause", "MIT", "GPL-3.0-or-later", "GPL-2.0-only"],
+	"license": ["BSD-2-Clause", "MIT", "GPL-3.0-or-later", "GPL-2.0-or-later"],
 	"type": "library",
 	"authors": [
 		{
