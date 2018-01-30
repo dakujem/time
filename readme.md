@@ -174,7 +174,7 @@ Run `composer require dakujem/time` command.
 Alternatively, add `"dakujem/time"` to the "require" section in your `composer.json` file, like this:
 ```json
 	"require": {
-		"dakujem/time": '^1'
+		"dakujem/time": "^1"
 	}
 ```
 
