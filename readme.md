@@ -166,13 +166,16 @@ Features that do not work correctly (yet) when using double:
 >**Note**: When using **double** data type all the PHP implementation limitations apply.
 
 ## Installation
-The easiest way to install Time is to use [Composer](https://getcomposer.org/). Just add `"dakujem/time"` to the "require" section in your `composer.json` file, like this:
+
+The easiest way to install *Time* is to use [Composer](https://getcomposer.org/).
+
+Run `composer require dakujem/time` command.
+
+Alternatively, add `"dakujem/time"` to the "require" section in your `composer.json` file, like this:
 ```json
-{
 	"require": {
-		"dakujem/time": '*'
+		"dakujem/time": '^1'
 	}
-}
 ```
 
 > **Note**: `dakujem/time` is built for and tested to run on PHP 5.6 and PHP 7 and above, however, it should also run on PHP 5.4 and 5.5 if needed.
