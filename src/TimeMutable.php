@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Dakujem;
-
 
 /**
  * A mutable time object.
@@ -15,30 +15,26 @@ namespace Dakujem;
  */
 class TimeMutable extends Time
 {
+    /**
+     * Set the time.
+     *
+     *
+     * @param int|string|static|DateTime|Carbon $time any parsable time format
+     * @return static
+     */
+    public function set($time)
+    {
+        return $this->_set($this->parse($time));
+    }
 
-
-	/**
-	 * Set the time.
-	 *
-	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
-	 * @return static
-	 */
-	public function set($time)
-	{
-		return $this->_set($this->parse($time));
-	}
-
-
-	/**
-	 * Internal setter.
-	 * @note: does NOT produce a copy of self
-	 * @internal
-	 */
-	protected function _set($value)
-	{
-		$this->time = $value === NULL ? NULL : $value * self::SECOND;
-		return $this;
-	}
-
+    /**
+     * Internal setter.
+     * @note: does NOT produce a copy of self
+     * @internal
+     */
+    protected function _set($value)
+    {
+        $this->time = $value === null ? null : $value * self::SECOND;
+        return $this;
+    }
 }
