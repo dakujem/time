@@ -16,6 +16,7 @@ use Carbon\Carbon,
 	DateTime,
 	Tester\Assert,
 	Tester\TestCase;
+use Carbon\CarbonInterface;
 
 
 /**
@@ -251,7 +252,7 @@ class TimeTest extends TestCase
 				Assert::same($val != 0 ? $base / $val : INF, $time->copy()->div($val)->getRaw());
 				if ($val != 0) {
 					$real = $time->copy()->mod($val)->getRaw();
-					$expected = is_int($val) && is_int($base) ? $base % $val : fmod($base, $val);
+					$expected = $base === null ? null : (is_int($val) && is_int($base) ? $base % $val : fmod($base, $val));
 					Assert::same($expected, $real);
 				} else {
 					Assert::nan($time->copy()->mod($val)->getRaw());
@@ -367,7 +368,7 @@ class TimeTest extends TestCase
 	public function testToCarbon()
 	{
 		$time = Time::fromSeconds(3723)->toCarbon();
-		Assert::type(Carbon::CLASS, $time);
+		Assert::type(CarbonInterface::class, $time);
 		Assert::same('01:02:03', $time->format('H:i:s'));
 	}
 
@@ -390,7 +391,7 @@ class TimeTest extends TestCase
 		// while using Time (which is immutable), any time modification results in a new instance of Time returned
 		$immutable = new Time(0);
 		$this->mutabilityObjectTest($immutable, FALSE);
-		
+
 		// to accumulate / change value one needs to use TimeMutable - mutable time object.
 		// calling add(), set() or any other modifying method actually returns the modified $mutable TimeMutable instance,
 		// so the result and the original are identical

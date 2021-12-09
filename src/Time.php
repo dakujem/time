@@ -3,9 +3,11 @@
 
 namespace Dakujem;
 
-use Carbon\Carbon,
-	DateTime,
-	RuntimeException;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
+use DateTime;
+use RuntimeException;
 
 
 /**
@@ -38,7 +40,7 @@ class Time implements TimeInterface
 	 * $this + $time
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time any parsable time format
 	 * @return static
 	 */
 	public function add($time)
@@ -107,7 +109,13 @@ class Time implements TimeInterface
 		if (!is_int($x) && !is_float($x)) {
 			$x = (double) $x;
 		}
-		return $this->_set($x !== 0.0 && $x !== 0 ? (is_int($this->_get()) && is_int($x) ? $this->_get() % $x : fmod($this->_get(), $x)) : NAN);
+        if ($x === 0.0 || $x === 0) {
+            return $this->_set(NAN);
+        }
+        if ($this->isNULL()) {
+            return $this->_set(null);
+        }
+		return $this->_set(is_int($this->_get()) && is_int($x) ? $this->_get() % $x : fmod($this->_get(), $x));
 	}
 
 
@@ -116,7 +124,7 @@ class Time implements TimeInterface
 	 * $this < $time
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time any parsable time format
 	 * @return bool
 	 */
 	public function lt($time)
@@ -130,7 +138,7 @@ class Time implements TimeInterface
 	 * $this <= $time
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time any parsable time format
 	 * @return bool
 	 */
 	public function lte($time)
@@ -144,7 +152,7 @@ class Time implements TimeInterface
 	 * $this > $time
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time any parsable time format
 	 * @return bool
 	 */
 	public function gt($time)
@@ -158,7 +166,7 @@ class Time implements TimeInterface
 	 * $this >= $time
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time any parsable time format
 	 * @return bool
 	 */
 	public function gte($time)
@@ -172,7 +180,7 @@ class Time implements TimeInterface
 	 * $this == $time
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time any parsable time format
 	 * @return bool
 	 */
 	public function eq($time)
@@ -186,7 +194,7 @@ class Time implements TimeInterface
 	 * $this != $time
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time any parsable time format
 	 * @return bool
 	 */
 	public function neq($time)
@@ -205,8 +213,8 @@ class Time implements TimeInterface
 	 * Note: $timeMin and $timeMax are determined from $time1 and $time2.
 	 *
 	 *
-	 * @param int|string|static|DateTime|Carbon $time1 any parsable time format
-	 * @param int|string|static|DateTime|Carbon $time2 any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time1 any parsable time format
+	 * @param int|string|static|DateTime|CarbonInterface $time2 any parsable time format
 	 * @param bool $sharp [=FALSE] exclude the extremes of the interval?
 	 * @return bool
 	 */
@@ -250,6 +258,9 @@ class Time implements TimeInterface
 	 */
 	public function clipToDayTime()
 	{
+        if ($this->isNULL()) {
+            return $this->_set(null);
+        }
 		$t = is_int($this->_get()) ? $this->_get() % self::DAY : fmod($this->_get(), self::DAY);
 		return $this->_set($t < 0 ? $t + self::DAY : $t);
 	}
@@ -521,13 +532,13 @@ class Time implements TimeInterface
 	 * If a Carbon instance is not provided, a new one will be created.
 	 *
 	 *
-	 * @param Carbon $target an istance to fill
-	 * @return Carbon
+	 * @param CarbonInterface|null $target an instance to fill
+	 * @return CarbonInterface
 	 */
-	public function toCarbon(Carbon $target = NULL)
+	public function toCarbon(CarbonInterface $target = NULL, bool $immutable = true) //: CarbonInterface
 	{
 		if ($target === NULL) {
-			$target = new Carbon();
+			$target = $immutable ? new CarbonImmutable() : new Carbon();
 		}
 		return $target->hour($this->getHours())->minute($this->getMinutes())->second($this->getSeconds());
 	}

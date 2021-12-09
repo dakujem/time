@@ -18,6 +18,8 @@ use Carbon\Carbon,
 	DateTime,
 	Tester\Assert,
 	Tester\TestCase;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 
 
 /**
@@ -273,8 +275,10 @@ class TimeHelperTest extends TestCase
 
 	public function testToCarbon()
 	{
+        Assert::type(CarbonImmutable::class, Time::fromSeconds(3723)->toCarbon(null, true));
+        Assert::type(Carbon::class, Time::fromSeconds(3723)->toCarbon(null, false));
 		$time = Time::fromSeconds(3723)->toCarbon();
-		Assert::type(Carbon::CLASS, $time);
+		Assert::type(CarbonInterface::CLASS, $time);
 		Assert::same('01:02:03', $time->format('H:i:s'));
 	}
 
