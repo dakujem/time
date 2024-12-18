@@ -16,7 +16,7 @@
   "require-dev": {
     "nette/tester": "^2",
     "tracy/tracy": "^2.3",
-    "nesbot/carbon": "^2"
+    "nesbot/carbon": "^2 || ^3"
   },
   "autoload": {
     "psr-4": {
