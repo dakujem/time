@@ -494,7 +494,7 @@ class Time implements TimeInterface
      * @param CarbonInterface|null $target an instance to fill
      * @return CarbonInterface
      */
-    public function toCarbon(CarbonInterface $target = null, bool $immutable = true) //: CarbonInterface
+    public function toCarbon(?CarbonInterface $target = null, bool $immutable = true) //: CarbonInterface
     {
         if ($target === null) {
             $target = $immutable ? new CarbonImmutable() : new Carbon();
