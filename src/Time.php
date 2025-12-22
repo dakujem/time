@@ -84,7 +84,7 @@ class Time implements TimeInterface
     public function div($x)
     {
         if (!is_int($x) && !is_float($x)) {
-            $x = (double)$x;
+            $x = (float)$x;
         }
         return $this->_set($x !== 0.0 && $x !== 0 ? $this->_get() / $x : INF);
     }
@@ -101,7 +101,7 @@ class Time implements TimeInterface
     public function mod($x)
     {
         if (!is_int($x) && !is_float($x)) {
-            $x = (double)$x;
+            $x = (float)$x;
         }
         if ($x === 0.0 || $x === 0) {
             return $this->_set(NAN);
